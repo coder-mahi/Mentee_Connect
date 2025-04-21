@@ -27,4 +27,16 @@ public class MentorServiceImpl implements MentorService {
     public Mentor getMentorById(Long id) {
         return mentorRepository.findById(id).orElse(null);
     }
+
+    @Override
+    public Mentor updateMentor(Long id, Mentor mentor) {
+        mentor.setId(id);
+        return mentorRepository.save(mentor);
+    }
+
+    @Override
+    public void deleteMentor(Long id) {
+        mentorRepository.deleteById(id);
+    }
 }
+
