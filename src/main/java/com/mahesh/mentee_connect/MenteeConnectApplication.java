@@ -9,5 +9,4 @@ public class MenteeConnectApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MenteeConnectApplication.class, args);
 	}
-
 }
