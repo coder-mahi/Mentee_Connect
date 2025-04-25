@@ -1,23 +1,42 @@
 package com.mahesh.mentee_connect.model;
-import jakarta.persistence.*;
-import lombok.*;
-import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Entity
-public class Student extends User {
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Data;
 
-    @ManyToOne
-    private Mentor mentor;
-
-    @ManyToOne
-    private Batch batch;
-
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
-    private List<Certificate> certificates;
+@Document(collection = "students")
+public class Student {
+    @Id
+    private String id;
+    private String name;
+    private String email;
+    private String mentorName;
+    
+    public String getId() {
+    	return id;
+    }
+    public void setId(String id) {
+    	this.id = id;
+    }
+    
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
+	public String getMentorName() {
+		return mentorName;
+	}
+	public void setMentorName(String mentorName) {
+		this.mentorName = mentorName;
+	}
 }
-
-
