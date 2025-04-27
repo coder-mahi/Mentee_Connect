@@ -23,21 +23,20 @@ public class LoginService {
     @Autowired
     private StudentRepository studentRepository;
     
-
     public Response login(String email, String password) {
-        // Check Admin login
-        Admin admin = adminRepository.findByEmail(email);
+    	//admin login
+    	Admin admin = adminRepository.findByEmail(email);
         if (admin != null && admin.getPassword().equals(password)) {
             return new Response("Admin Login Successful", true);
         }
 
-        // Check Mentor login
+        //mentor login
         Mentor mentor = mentorRepository.findByEmail(email);
         if (mentor != null && mentor.getEmail().equals(email)) {
             return new Response("Mentor Login Successful", true);
         }
 
-        // Check Student login
+        //student login
         Student student = studentRepository.findByEmail(email);
         if (student != null && student.getEmail().equals(email)) {
             return new Response("Student Login Successful", true);

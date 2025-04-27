@@ -15,6 +15,7 @@ import com.mahesh.mentee_connect.model.*;
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
+	
 	@Autowired
 	private AdminService adminService;
 	
@@ -24,7 +25,7 @@ public class AdminController {
 	}
 	
 	@PostMapping
-	public Admin addAdmin(@RequestBody Admin admin) {
+	public Admin addAdmin(@RequestBody Admin admin){
 	    System.out.println("Received Admin: " + admin); // Log the object
 	    return adminService.addAdmin(admin);
 	}

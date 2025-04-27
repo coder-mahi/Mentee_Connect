@@ -1,6 +1,5 @@
 package com.mahesh.mentee_connect.service;
 
-import com.mahesh.mentee_connect.model.Response;
 import com.mahesh.mentee_connect.model.Student;
 import com.mahesh.mentee_connect.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +9,10 @@ import java.util.List;
 
 @Service
 public class StudentService {
-
     @Autowired
     private StudentRepository repository;
 
-    public List<Student> getAllStudents() {
+    public List<Student> getAllStudents(){
         return repository.findAll();
     }
 
