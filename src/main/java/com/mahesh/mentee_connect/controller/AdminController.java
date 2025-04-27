@@ -1,6 +1,5 @@
 package com.mahesh.mentee_connect.controller;
 
-import org.apache.catalina.connector.Response;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,11 +34,6 @@ public class AdminController {
 		return adminService.updateAdmin(id,admin);
 	}
 	
-	@PostMapping("/login")
-	public Response loginAdmin(@RequestBody LoginRequest loginRequest) {
-	    return adminService.login(loginRequest.getEmail(), loginRequest.getPassword());
-	}
-
 
 	
 }
