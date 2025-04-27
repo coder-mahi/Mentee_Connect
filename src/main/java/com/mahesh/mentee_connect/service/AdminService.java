@@ -1,7 +1,5 @@
 package com.mahesh.mentee_connect.service;
 
-import java.util.List;
-
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

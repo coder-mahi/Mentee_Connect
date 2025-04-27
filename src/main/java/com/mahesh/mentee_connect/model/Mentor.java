@@ -9,11 +9,10 @@ public class Mentor {
     @Id
     private String id;
     private String name;
-    private String email;
-    private String password; // Added for login
+    private String email;    // Added later for Loggin purpose
+    private String password; // Added later for Loggin purpose
     private String expertise;
 
-    // Getters and Setters
     public String getId() {
         return id;
     }

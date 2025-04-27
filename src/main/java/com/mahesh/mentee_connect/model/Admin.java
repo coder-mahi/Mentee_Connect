@@ -13,7 +13,6 @@ public class Admin {
     private String email;
     private String password;
 
-    // Getters and Setters
     public ObjectId getId() {
         return id;
     }
