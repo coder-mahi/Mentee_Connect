@@ -1,5 +1,7 @@
 package com.mahesh.mentee_connect.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -41,10 +43,15 @@ public class LoginService {
             return new Response("Mentor Login Successful", true);
         }
 
-        //student login
-        Student student = studentRepository.findByEmail(email);
-        if (student != null && passwordEncoder.matches(password, student.getPassword())) {
-            return new Response("Student Login Successful", true);
+     // Find student by email
+        Optional<Student> optionalStudent = studentRepository.findByEmail(email);
+
+        // Check if student exists and password matches
+        if (optionalStudent.isPresent()) {
+            Student student = optionalStudent.get();
+            if (passwordEncoder.matches(password, student.getPassword())) {
+                return new Response("Student Login Successful", true);
+            }
         }
 
         return new Response("Invalid Email or Password", false);

@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentService {
@@ -46,4 +47,19 @@ public class StudentService {
     public void deleteStudent(String id) {
         repository.deleteById(id);
     }
+    
+    
+    public boolean assignMentor(String studentEmail, String mentorName) {
+        Optional<Student> studentOptional = repository.findByEmail(studentEmail);
+
+        if (studentOptional.isPresent()) {
+            Student student = studentOptional.get();
+            student.setMentorName(mentorName);
+            repository.save(student);
+            return true; // Success
+        } else {
+            return false; // Student not found
+        }
+    }
+        
 }
