@@ -14,6 +14,7 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
     // Login API for Admin, Mentor, and Student
+    
     @PostMapping
     public Response login(@RequestBody LoginRequest loginRequest) {
         return loginService.login(loginRequest.getEmail(), loginRequest.getPassword());
