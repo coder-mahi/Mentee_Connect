@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students | Mentee Connect</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>Mentee Connect</h3>
+                <p>Admin Dashboard</p>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li class="active"><a href="students.html">Students</a></li>
+                    <li><a href="mentors.html">Mentors</a></li>
+                    <li><a href="batches.html">Batches</a></li>
+                    <li><a href="#" id="logout">Logout</a></li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <header class="content-header">
+                <h2>Student Management</h2>
+                <div class="user-info">
+                    <span id="userEmail"></span>
+                </div>
+            </header>
+            
+            <div class="action-bar">
+                <button id="addStudentBtn" class="btn">Add Student</button>
+            </div>
+            
+            <div class="table-container">
+                <table id="studentsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Mentor</th>
+                            <th>Batch</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Students will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Add Student Modal -->
+            <div id="studentModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h3 id="modalTitle">Add New Student</h3>
+                    <form id="studentForm">
+                        <input type="hidden" id="studentId">
+                        <div class="form-group">
+                            <label for="studentName">Name</label>
+                            <input type="text" id="studentName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentEmail">Email</label>
+                            <input type="email" id="studentEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentMentor">Mentor</label>
+                            <select id="studentMentor">
+                                <!-- Mentors will be loaded here -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentBatch">Batch</label>
+                            <select id="studentBatch">
+                                <!-- Batches will be loaded here -->
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Save</button>
+                    </form>
+                    <div id="studentMessage" class="message"></div>
+                </div>
+            </div>
+            
+            <!-- Assign Mentor Modal -->
+            <div id="assignMentorModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h3>Assign Mentor</h3>
+                    <form id="assignMentorForm">
+                        <input type="hidden" id="assignStudentEmail">
+                        <div class="form-group">
+                            <label for="mentorToAssign">Select Mentor</label>
+                            <select id="mentorToAssign" required>
+                                <!-- Mentors will be loaded here -->
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Assign</button>
+                    </form>
+                    <div id="assignMentorMessage" class="message"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="../js/common.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+</html>

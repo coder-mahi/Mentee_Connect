@@ -1,0 +1,48 @@
+/* Mentor Dashboard Styles */
+.mentor-info {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.mentor-profile {
+    flex: 1;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.mentor-stats {
+    flex: 1;
+    display: flex;
+    gap: 20px;
+}
+
+.stat-card {
+    flex: 1;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.stat-card h4 {
+    font-size: 1rem;
+    color: var(--gray-color);
+    margin-bottom: 10px;
+}
+
+.stat-card p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.mentor-students {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}

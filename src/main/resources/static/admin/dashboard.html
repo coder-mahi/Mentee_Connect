@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Mentee Connect</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>Mentee Connect</h3>
+                <p>Admin Dashboard</p>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active"><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="students.html">Students</a></li>
+                    <li><a href="mentors.html">Mentors</a></li>
+                    <li><a href="batches.html">Batches</a></li>
+                    <li><a href="#" id="logout">Logout</a></li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <header class="content-header">
+                <h2>Admin Dashboard</h2>
+                <div class="user-info">
+                    <span id="userEmail"></span>
+                </div>
+            </header>
+            
+            <div class="dashboard-cards">
+                <div class="card">
+                    <h3>Total Students</h3>
+                    <p id="totalStudents">0</p>
+                </div>
+                <div class="card">
+                    <h3>Total Mentors</h3>
+                    <p id="totalMentors">0</p>
+                </div>
+                <div class="card">
+                    <h3>Total Batches</h3>
+                    <p id="totalBatches">0</p>
+                </div>
+            </div>
+            
+            <section class="recent-activity">
+                <h3>Recent Activity</h3>
+                <div class="activity-list" id="recentActivity">
+                    <!-- Activity items will be added here dynamically -->
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script src="../js/common.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+</html>

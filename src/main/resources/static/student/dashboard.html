@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | Mentee Connect</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/student.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>Mentee Connect</h3>
+                <p>Student Dashboard</p>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active"><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="#" id="logout">Logout</a></li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <header class="content-header">
+                <h2>Student Dashboard</h2>
+                <div class="user-info">
+                    <span id="userEmail"></span>
+                </div>
+            </header>
+            
+            <div class="student-info">
+                <div class="student-profile">
+                    <h3 id="studentName">Student Name</h3>
+                    <p id="studentBatch">Batch: Not assigned</p>
+                    <p id="studentMentor">Mentor: Not assigned</p>
+                </div>
+            </div>
+            
+            <section class="student-resources">
+                <h3>Your Resources</h3>
+                <div class="resources-grid">
+                    <div class="resource-card">
+                        <h4>Schedule Meeting</h4>
+                        <p>Book a session with your mentor</p>
+                        <button class="btn">Schedule</button>
+                    </div>
+                    <div class="resource-card">
+                        <h4>Learning Materials</h4>
+                        <p>Access course materials</p>
+                        <button class="btn">View</button>
+                    </div>
+                    <div class="resource-card">
+                        <h4>Progress Report</h4>
+                        <p>View your learning progress</p>
+                        <button class="btn">View</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script src="../js/common.js"></script>
+    <script src="../js/student.js"></script>
+</body>
+</html>
