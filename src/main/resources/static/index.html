@@ -4,43 +4,1773 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mentee Connect</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --light-bg: #f8f9fa;
+            --dark-bg: #212529;
+            --text-dark: #212529;
+            --text-light: #f8f9fa;
+            --border: #dee2e6;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--primary);
+            padding: 1rem 2rem;
+            color: var(--text-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar h1 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        .navbar a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar a:hover,
+        .navbar a.active {
+            background-color: var(--secondary);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            flex: 1;
+        }
+
+        /* Login Page */
+        .login-container {
+            max-width: 400px;
+            margin: 4rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .login-container h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        /* Dashboard Cards */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-icon {
+            background-color: var(--accent);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stats {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .stat {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            background-color: var(--light-bg);
+            border-radius: 6px;
+        }
+
+        .stat h3 {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .stat p {
+            font-size: 0.875rem;
+            color: var(--text-dark);
+            opacity: 0.8;
+        }
+
+        /* Tables */
+        .table-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background-color: var(--primary);
+            color: var(--text-light);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: var(--light-bg);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        /* Forms */
+        .form-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-title {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary);
+            color: var(--text-light);
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: var(--warning);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.875rem;
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-dark);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(67, 97, 238, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background-color: rgba(76, 201, 240, 0.1);
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-error {
+            background-color: rgba(247, 37, 133, 0.1);
+            border-left: 4px solid var(--warning);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            
+            .navbar ul {
+                margin-top: 1rem;
+                gap: 0.75rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-container {
+                overflow-x: auto;
+            }
+        }
+
+        /* Page Specific Styles */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Action buttons in tables */
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .delete-btn {
+            color: var(--warning);
+            background-color: rgba(247, 37, 133, 0.1);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Mentee Connect</h1>
-        <p>Bridging the gap between mentors and students</p>
-    </header>
-    
-    <main>
-        <section class="hero">
-            <h2>Welcome to Mentee Connect</h2>
-            <p>A platform for seamless mentor-student collaboration</p>
-            <div class="cta-buttons">
-                <a href="login.html" class="btn">Login</a>
+    <!-- Login Page -->
+    <div id="login-page" class="page active">
+        <div class="login-container">
+            <h2><i class="fas fa-graduation-cap"></i> Mentee Connect</h2>
+            <div id="login-alert" class="alert alert-error" style="display: none;"></div>
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <input type="email" id="login-email" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="login-password" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app-container" class="page">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <h1><i class="fas fa-graduation-cap"></i> Mentee Connect</h1>
+            <ul>
+                <li><a href="#" class="nav-link active" data-page="dashboard">Dashboard</a></li>
+                <li><a href="#" class="nav-link" data-page="students">Students</a></li>
+                <li><a href="#" class="nav-link" data-page="mentors">Mentors</a></li>
+                <li><a href="#" class="nav-link" data-page="batches">Batches</a></li>
+                <li><a href="#" id="logout-btn">Logout</a></li>
+            </ul>
+        </nav>
+
+        <!-- Dashboard Page -->
+        <div class="container">
+            <div id="dashboard-page" class="page active">
+                <h2 style="margin-bottom: 1.5rem;">Dashboard</h2>
+                <div class="dashboard">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="card-icon"><i class="fas fa-user-graduate"></i></div>
+                                <span>Students</span>
+                            </div>
+                            <a href="#" class="btn btn-small" data-page="students">View All</a>
+                        </div>
+                        <div class="stats">
+                            <div class="stat">
+                                <h3 id="total-students">--</h3>
+                                <p>Total</p>
+                            </div>
+                            <div class="stat">
+                                <h3 id="assigned-students">--</h3>
+                                <p>Assigned</p>
+                            </div>
+                            <div class="stat">
+                                <h3 id="unassigned-students">--</h3>
+                                <p>Unassigned</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="card-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                                <span>Mentors</span>
+                            </div>
+                            <a href="#" class="btn btn-small" data-page="mentors">View All</a>
+                        </div>
+                        <div class="stats">
+                            <div class="stat">
+                                <h3 id="total-mentors">--</h3>
+                                <p>Total</p>
+                            </div>
+                            <div class="stat">
+                                <h3 id="active-mentors">--</h3>
+                                <p>Active</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <div class="card-icon"><i class="fas fa-users"></i></div>
+                                <span>Batches</span>
+                            </div>
+                            <a href="#" class="btn btn-small" data-page="batches">View All</a>
+                        </div>
+                        <div class="stats">
+                            <div class="stat">
+                                <h3 id="total-batches">--</h3>
+                                <p>Total</p>
+                            </div>
+                            <div class="stat">
+                                <h3 id="active-batches">--</h3>
+                                <p>Active</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Recent Students</h3>
+                    </div>
+                    <table id="recent-students-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Batch</th>
+                                <th>Mentor</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-students-body">
+                            <!-- Recent students will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </section>
+
+            <!-- Students Page -->
+            <div id="students-page" class="page">
+                <div class="table-header" style="margin-bottom: 1.5rem; border-radius: 8px;">
+                    <h2>Students Management</h2>
+                    <button id="add-student-btn" class="btn">Add Student</button>
+                </div>
+                
+                <div class="table-container">
+                    <table id="students-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Batch</th>
+                                <th>Mentor</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-table-body">
+                            <!-- Students will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Add/Edit Student Modal -->
+                <div id="student-modal-backdrop" class="modal-backdrop">
+                    <div class="modal">
+                        <div class="modal-header">
+                            <h3 id="student-modal-title">Add Student</h3>
+                            <button class="close-btn" id="close-student-modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="student-form">
+                                <input type="hidden" id="student-id">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="student-name">Name</label>
+                                        <input type="text" id="student-name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="student-email">Email</label>
+                                        <input type="email" id="student-email" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="student-phone">Phone</label>
+                                        <input type="tel" id="student-phone" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="student-batch">Batch</label>
+                                        <select id="student-batch" required>
+                                            <!-- Batches will be loaded here -->
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="student-password">Password</label>
+                                    <input type="password" id="student-password">
+                                    <small>(Leave empty to keep current password)</small>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-danger" id="cancel-student-modal">Cancel</button>
+                            <button class="btn" id="save-student">Save</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assign Mentor Modal -->
+                <div id="assign-mentor-modal-backdrop" class="modal-backdrop">
+                    <div class="modal">
+                        <div class="modal-header">
+                            <h3>Assign Mentor</h3>
+                            <button class="close-btn" id="close-assign-mentor-modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="assign-mentor-form">
+                                <input type="hidden" id="assign-student-email">
+                                <div class="form-group">
+                                    <label for="assign-mentor-select">Select Mentor</label>
+                                    <select id="assign-mentor-select" required>
+                                        <!-- Mentors will be loaded here -->
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-danger" id="cancel-assign-mentor-modal">Cancel</button>
+                            <button class="btn" id="save-assign-mentor">Assign</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mentors Page -->
+            <div id="mentors-page" class="page">
+                <div class="table-header" style="margin-bottom: 1.5rem; border-radius: 8px;">
+                    <h2>Mentors Management</h2>
+                    <button id="add-mentor-btn" class="btn">Add Mentor</button>
+                </div>
+                
+                <div class="table-container">
+                    <table id="mentors-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Specialization</th>
+                                <th>Students</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mentors-table-body">
+                            <!-- Mentors will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Add/Edit Mentor Modal -->
+                <div id="mentor-modal-backdrop" class="modal-backdrop">
+                    <div class="modal">
+                        <div class="modal-header">
+                            <h3 id="mentor-modal-title">Add Mentor</h3>
+                            <button class="close-btn" id="close-mentor-modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="mentor-form">
+                                <input type="hidden" id="mentor-id">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="mentor-name">Name</label>
+                                        <input type="text" id="mentor-name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="mentor-email">Email</label>
+                                        <input type="email" id="mentor-email" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="mentor-phone">Phone</label>
+                                        <input type="tel" id="mentor-phone" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="mentor-specialization">Specialization</label>
+                                        <input type="text" id="mentor-specialization" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="mentor-password">Password</label>
+                                    <input type="password" id="mentor-password">
+                                    <small>(Leave empty to keep current password)</small>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-danger" id="cancel-mentor-modal">Cancel</button>
+                            <button class="btn" id="save-mentor">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Batches Page -->
+            <div id="batches-page" class="page">
+                <div class="table-header" style="margin-bottom: 1.5rem; border-radius: 8px;">
+                    <h2>Batches Management</h2>
+                    <button id="add-batch-btn" class="btn">Add Batch</button>
+                </div>
+                
+                <div class="table-container">
+                    <table id="batches-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Students</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="batches-table-body">
+                            <!-- Batches will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Add/Edit Batch Modal -->
+                <div id="batch-modal-backdrop" class="modal-backdrop">
+                    <div class="modal">
+                        <div class="modal-header">
+                            <h3 id="batch-modal-title">Add Batch</h3>
+                            <button class="close-btn" id="close-batch-modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="batch-form">
+                                <input type="hidden" id="batch-id">
+                                <div class="form-group">
+                                    <label for="batch-name">Batch Name</label>
+                                    <input type="text" id="batch-name" required>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="batch-start-date">Start Date</label>
+                                        <input type="date" id="batch-start-date" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="batch-end-date">End Date</label>
+                                        <input type="date" id="batch-end-date" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="batch-description">Description</label>
+                                    <textarea id="batch-description" rows="3"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-danger" id="cancel-batch-modal">Cancel</button>
+                            <button class="btn" id="save-batch">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 Mentee Connect. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Global state
+        const state = {
+            currentPage: 'dashboard',
+            userType: null,
+            userData: null,
+            students: [],
+            mentors: [],
+            batches: [],
+            apiBaseUrl: '/api', // Base URL for API requests
+            token: localStorage.getItem('token'),
+            userRole: localStorage.getItem('userRole')
+        };
+
+        // DOM Elements
+        const loginPage = document.getElementById('login-page');
+        const appContainer = document.getElementById('app-container');
+        const loginForm = document.getElementById('login-form');
+        const loginEmail = document.getElementById('login-email');
+        const loginPassword = document.getElementById('login-password');
+        const loginAlert = document.getElementById('login-alert');
+        const logoutBtn = document.getElementById('logout-btn');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const pages = document.querySelectorAll('.page');
+
+        // Student Modal Elements
+        const studentModalBackdrop = document.getElementById('student-modal-backdrop');
+        const studentModalTitle = document.getElementById('student-modal-title');
+        const studentForm = document.getElementById('student-form');
+        const studentId = document.getElementById('student-id');
+        const studentName = document.getElementById('student-name');
+        const studentEmail = document.getElementById('student-email');
+        const studentPhone = document.getElementById('student-phone');
+        const studentBatch = document.getElementById('student-batch');
+        const studentPassword = document.getElementById('student-password');
+        const addStudentBtn = document.getElementById('add-student-btn');
+        const saveStudentBtn = document.getElementById('save-student');
+        const closeStudentModal = document.getElementById('close-student-modal');
+        const cancelStudentModal = document.getElementById('cancel-student-modal');
+
+        // Mentor Modal Elements
+        const mentorModalBackdrop = document.getElementById('mentor-modal-backdrop');
+        const mentorModalTitle = document.getElementById('mentor-modal-title');
+        const mentorForm = document.getElementById('mentor-form');
+        const mentorId = document.getElementById('mentor-id');
+        const mentorName = document.getElementById('mentor-name');
+        const mentorEmail = document.getElementById('mentor-email');
+        const mentorPhone = document.getElementById('mentor-phone');
+        const mentorSpecialization = document.getElementById('mentor-specialization');
+        const mentorPassword = document.getElementById('mentor-password');
+        const addMentorBtn = document.getElementById('add-mentor-btn');
+        const saveMentorBtn = document.getElementById('save-mentor');
+        const closeMentorModal = document.getElementById('close-mentor-modal');
+        const cancelMentorModal = document.getElementById('cancel-mentor-modal');
+
+        // Batch Modal Elements
+        const batchModalBackdrop = document.getElementById('batch-modal-backdrop');
+        const batchModalBackdrop = document.getElementById('batch-modal-backdrop');
+        const batchModalTitle = document.getElementById('batch-modal-title');
+        const batchForm = document.getElementById('batch-form');
+        const batchId = document.getElementById('batch-id');
+        const batchName = document.getElementById('batch-name');
+        const batchStartDate = document.getElementById('batch-start-date');
+        const batchEndDate = document.getElementById('batch-end-date');
+        const batchDescription = document.getElementById('batch-description');
+        const addBatchBtn = document.getElementById('add-batch-btn');
+        const saveBatchBtn = document.getElementById('save-batch');
+        const closeBatchModal = document.getElementById('close-batch-modal');
+        const cancelBatchModal = document.getElementById('cancel-batch-modal');
+
+        // Assign Mentor Modal Elements
+        const assignMentorModalBackdrop = document.getElementById('assign-mentor-modal-backdrop');
+        const assignMentorForm = document.getElementById('assign-mentor-form');
+        const assignStudentEmail = document.getElementById('assign-student-email');
+        const assignMentorSelect = document.getElementById('assign-mentor-select');
+        const saveAssignMentor = document.getElementById('save-assign-mentor');
+        const closeAssignMentorModal = document.getElementById('close-assign-mentor-modal');
+        const cancelAssignMentorModal = document.getElementById('cancel-assign-mentor-modal');
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is logged in
+            checkAuth();
+            
+            // Login form submission
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                login();
+            });
+            
+            // Logout button click
+            logoutBtn.addEventListener('click', logout);
+            
+            // Navigation links
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    const page = link.getAttribute('data-page');
+                    navigateTo(page);
+                });
+            });
+            
+            // Student modal events
+            addStudentBtn.addEventListener('click', openAddStudentModal);
+            closeStudentModal.addEventListener('click', closeStudentModalFn);
+            cancelStudentModal.addEventListener('click', closeStudentModalFn);
+            saveStudentBtn.addEventListener('click', saveStudent);
+            
+            // Mentor modal events
+            addMentorBtn.addEventListener('click', openAddMentorModal);
+            closeMentorModal.addEventListener('click', closeMentorModalFn);
+            cancelMentorModal.addEventListener('click', closeMentorModalFn);
+            saveMentorBtn.addEventListener('click', saveMentor);
+            
+            // Batch modal events
+            addBatchBtn.addEventListener('click', openAddBatchModal);
+            closeBatchModal.addEventListener('click', closeBatchModalFn);
+            cancelBatchModal.addEventListener('click', closeBatchModalFn);
+            saveBatchBtn.addEventListener('click', saveBatch);
+            
+            // Assign mentor modal events
+            closeAssignMentorModal.addEventListener('click', closeAssignMentorModalFn);
+            cancelAssignMentorModal.addEventListener('click', closeAssignMentorModalFn);
+            saveAssignMentor.addEventListener('click', assignMentor);
+        });
+
+        // Authentication Functions
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const userRole = localStorage.getItem('userRole');
+            
+            if (token && userRole) {
+                // User is logged in
+                loginPage.classList.remove('active');
+                appContainer.classList.add('active');
+                state.userType = userRole;
+                loadDashboard();
+            } else {
+                // User is not logged in
+                loginPage.classList.add('active');
+                appContainer.classList.remove('active');
+            }
+        }
         
-        <section class="features">
-            <div class="feature">
-                <h3>For Students</h3>
-                <p>Connect with experienced mentors to guide your learning journey.</p>
-            </div>
-            <div class="feature">
-                <h3>For Mentors</h3>
-                <p>Share your knowledge and help shape the next generation.</p>
-            </div>
-            <div class="feature">
-                <h3>For Admins</h3>
-                <p>Manage the entire ecosystem with powerful tools.</p>
-            </div>
-        </section>
-    </main>
-    
-    <footer>
-        <p>&copy; 2023 Mentee Connect. All rights reserved.</p>
-    </footer>
-    
-    <script src="js/common.js"></script>
-</body>
-</html>
+        function login() {
+            const email = loginEmail.value;
+            const password = loginPassword.value;
+            
+            // Show loading state
+            saveStudentBtn.textContent = 'Logging in...';
+            saveStudentBtn.disabled = true;
+            
+            // Call login API
+            fetch(`${state.apiBaseUrl}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Login successful
+                    localStorage.setItem('token', data.data.token || 'demo-token');
+                    localStorage.setItem('userRole', data.data.role);
+                    localStorage.setItem('userData', JSON.stringify(data.data));
+                    
+                    state.userType = data.data.role;
+                    state.userData = data.data;
+                    
+                    // Navigate to dashboard
+                    loginPage.classList.remove('active');
+                    appContainer.classList.add('active');
+                    loadDashboard();
+                } else {
+                    // Login failed
+                    showLoginError(data.message || 'Invalid email or password');
+                }
+            })
+            .catch(error => {
+                console.error('Login error:', error);
+                showLoginError('An error occurred. Please try again.');
+            })
+            .finally(() => {
+                // Reset loading state
+                saveStudentBtn.textContent = 'Login';
+                saveStudentBtn.disabled = false;
+            });
+        }
+        
+        function showLoginError(message) {
+            loginAlert.textContent = message;
+            loginAlert.style.display = 'block';
+            
+            // Hide error after 5 seconds
+            setTimeout(() => {
+                loginAlert.style.display = 'none';
+            }, 5000);
+        }
+        
+        function logout() {
+            // Clear local storage
+            localStorage.removeItem('token');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userData');
+            
+            // Reset state
+            state.userType = null;
+            state.userData = null;
+            
+            // Navigate to login page
+            loginPage.classList.add('active');
+            appContainer.classList.remove('active');
+        }
+        
+        // Navigation Functions
+        function navigateTo(page) {
+            // Update active page in state
+            state.currentPage = page;
+            
+            // Update active nav link
+            navLinks.forEach(link => {
+                if (link.getAttribute('data-page') === page) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+            
+            // Show active page
+            pages.forEach(p => {
+                if (p.id === `${page}-page`) {
+                    p.classList.add('active');
+                } else {
+                    p.classList.remove('active');
+                }
+            });
+            
+            // Load page data
+            loadPageData(page);
+        }
+        
+        function loadPageData(page) {
+            switch (page) {
+                case 'dashboard':
+                    loadDashboard();
+                    break;
+                case 'students':
+                    loadStudents();
+                    break;
+                case 'mentors':
+                    loadMentors();
+                    break;
+                case 'batches':
+                    loadBatches();
+                    break;
+            }
+        }
+        
+        // Dashboard Functions
+        function loadDashboard() {
+            // Load statistics
+            loadStatistics();
+            
+            // Load recent students
+            loadRecentStudents();
+        }
+        
+        function loadStatistics() {
+            // Load Students Count
+            fetch(`${state.apiBaseUrl}/students`)
+                .then(response => response.json())
+                .then(students => {
+                    state.students = students;
+                    
+                    // Update statistics
+                    const totalStudents = students.length;
+                    const assignedStudents = students.filter(s => s.mentorName).length;
+                    const unassignedStudents = totalStudents - assignedStudents;
+                    
+                    document.getElementById('total-students').textContent = totalStudents;
+                    document.getElementById('assigned-students').textContent = assignedStudents;
+                    document.getElementById('unassigned-students').textContent = unassignedStudents;
+                })
+                .catch(error => console.error('Error loading students:', error));
+            
+            // Load Mentors Count
+            fetch(`${state.apiBaseUrl}/mentors`)
+                .then(response => response.json())
+                .then(mentors => {
+                    state.mentors = mentors;
+                    
+                    // Update statistics
+                    const totalMentors = mentors.length;
+                    // Assuming all mentors are active for demo
+                    const activeMentors = totalMentors;
+                    
+                    document.getElementById('total-mentors').textContent = totalMentors;
+                    document.getElementById('active-mentors').textContent = activeMentors;
+                })
+                .catch(error => console.error('Error loading mentors:', error));
+            
+            // Load Batches Count
+            fetch(`${state.apiBaseUrl}/batches`)
+                .then(response => response.json())
+                .then(batches => {
+                    state.batches = batches;
+                    
+                    // Update statistics
+                    const totalBatches = batches.length;
+                    // Active batches (current date is between start and end date)
+                    const today = new Date();
+                    const activeBatches = batches.filter(batch => {
+                        const startDate = new Date(batch.startDate);
+                        const endDate = new Date(batch.endDate);
+                        return today >= startDate && today <= endDate;
+                    }).length;
+                    
+                    document.getElementById('total-batches').textContent = totalBatches;
+                    document.getElementById('active-batches').textContent = activeBatches;
+                })
+                .catch(error => console.error('Error loading batches:', error));
+        }
+        
+        function loadRecentStudents() {
+            fetch(`${state.apiBaseUrl}/students`)
+                .then(response => response.json())
+                .then(students => {
+                    // Display only the most recent 5 students
+                    const recentStudents = students.slice(0, 5);
+                    
+                    // Update table
+                    const tbody = document.getElementById('recent-students-body');
+                    tbody.innerHTML = '';
+                    
+                    recentStudents.forEach(student => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${student.name}</td>
+                            <td>${student.email}</td>
+                            <td>${student.batch || 'Not Assigned'}</td>
+                            <td>${student.mentorName || 'Not Assigned'}</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn edit-btn" title="Edit" onclick="editStudent('${student.id}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete-btn" title="Delete" onclick="deleteStudent('${student.id}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(error => console.error('Error loading recent students:', error));
+        }
+        
+        // Students Functions
+        function loadStudents() {
+            Promise.all([
+                fetch(`${state.apiBaseUrl}/students`).then(res => res.json()),
+                fetch(`${state.apiBaseUrl}/batches`).then(res => res.json())
+            ])
+            .then(([students, batches]) => {
+                state.students = students;
+                state.batches = batches;
+                
+                // Update students table
+                const tbody = document.getElementById('students-table-body');
+                tbody.innerHTML = '';
+                
+                students.forEach(student => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${student.name}</td>
+                        <td>${student.email}</td>
+                        <td>${student.phone || 'N/A'}</td>
+                        <td>${student.batch || 'Not Assigned'}</td>
+                        <td>${student.mentorName || 'Not Assigned'}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn edit-btn" title="Edit" onclick="editStudent('${student.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn edit-btn" title="Assign Mentor" onclick="openAssignMentorModal('${student.email}')">
+                                    <i class="fas fa-user-plus"></i>
+                                </button>
+                                <button class="action-btn delete-btn" title="Delete" onclick="deleteStudent('${student.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                
+                // Update batch dropdown in student form
+                const batchSelect = document.getElementById('student-batch');
+                batchSelect.innerHTML = '<option value="">Select Batch</option>';
+                
+                batches.forEach(batch => {
+                    const option = document.createElement('option');
+                    option.value = batch.name;
+                    option.textContent = batch.name;
+                    batchSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error loading students data:', error));
+        }
+        
+        function openAddStudentModal() {
+            // Reset form
+            studentForm.reset();
+            studentId.value = '';
+            
+            // Update modal title
+            studentModalTitle.textContent = 'Add Student';
+            
+            // Show password field (required for new students)
+            studentPassword.required = true;
+            studentPassword.parentElement.querySelector('small').style.display = 'none';
+            
+            // Show modal
+            studentModalBackdrop.style.display = 'flex';
+        }
+        
+        function editStudent(id) {
+            const student = state.students.find(s => s.id === id);
+            
+            if (student) {
+                // Fill form with student data
+                studentId.value = student.id;
+                studentName.value = student.name;
+                studentEmail.value = student.email;
+                studentPhone.value = student.phone || '';
+                studentBatch.value = student.batch || '';
+                studentPassword.value = '';
+                
+                // Update modal title
+                studentModalTitle.textContent = 'Edit Student';
+                
+                // Password is optional when editing
+                studentPassword.required = false;
+                studentPassword.parentElement.querySelector('small').style.display = 'block';
+                
+                // Show modal
+                studentModalBackdrop.style.display = 'flex';
+            }
+        }
+        
+        function closeStudentModalFn() {
+            studentModalBackdrop.style.display = 'none';
+        }
+        
+        function saveStudent() {
+            // Get form data
+            const student = {
+                name: studentName.value,
+                email: studentEmail.value,
+                phone: studentPhone.value,
+                batch: studentBatch.value
+            };
+            
+            // Add password only if provided
+            if (studentPassword.value) {
+                student.password = studentPassword.value;
+            }
+            
+            // Determine if this is an add or update operation
+            const isUpdate = studentId.value !== '';
+            const url = isUpdate 
+                ? `${state.apiBaseUrl}/students/${studentId.value}`
+                : `${state.apiBaseUrl}/students`;
+            const method = isUpdate ? 'PUT' : 'POST';
+            
+            // If updating, add id to the object
+            if (isUpdate) {
+                student.id = studentId.value;
+            }
+            
+            // Show loading state
+            saveStudentBtn.textContent = 'Saving...';
+            saveStudentBtn.disabled = true;
+            
+            // Call API
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(student)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Close modal
+                closeStudentModalFn();
+                
+                // Reload students
+                loadStudents();
+                
+                // If on dashboard, reload recent students
+                if (state.currentPage === 'dashboard') {
+                    loadRecentStudents();
+                }
+            })
+            .catch(error => {
+                console.error('Error saving student:', error);
+                alert('Failed to save student. Please try again.');
+            })
+            .finally(() => {
+                // Reset loading state
+                saveStudentBtn.textContent = 'Save';
+                saveStudentBtn.disabled = false;
+            });
+        }
+        
+        function deleteStudent(id) {
+            if (confirm('Are you sure you want to delete this student?')) {
+                fetch(`${state.apiBaseUrl}/students/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(() => {
+                    // Reload students
+                    loadStudents();
+                    
+                    // If on dashboard, reload recent students
+                    if (state.currentPage === 'dashboard') {
+                        loadRecentStudents();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting student:', error);
+                    alert('Failed to delete student. Please try again.');
+                });
+            }
+        }
+        
+        function openAssignMentorModal(studentEmail) {
+            // Set student email
+            assignStudentEmail.value = studentEmail;
+            
+            // Load mentors for dropdown
+            loadMentorsForAssignment();
+            
+            // Show modal
+            assignMentorModalBackdrop.style.display = 'flex';
+        }
+        
+        function loadMentorsForAssignment() {
+            fetch(`${state.apiBaseUrl}/mentors`)
+                .then(response => response.json())
+                .then(mentors => {
+                    // Update mentor dropdown
+                    const mentorSelect = document.getElementById('assign-mentor-select');
+                    mentorSelect.innerHTML = '<option value="">Select Mentor</option>';
+                    
+                    mentors.forEach(mentor => {
+                        const option = document.createElement('option');
+                        option.value = mentor.name;
+                        option.textContent = mentor.name;
+                        mentorSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading mentors for assignment:', error));
+        }
+        
+        function closeAssignMentorModalFn() {
+            assignMentorModalBackdrop.style.display = 'none';
+        }
+        
+        function assignMentor() {
+            const studentEmail = assignStudentEmail.value;
+            const mentorName = assignMentorSelect.value;
+            
+            if (!studentEmail || !mentorName) {
+                alert('Please select a mentor');
+                return;
+            }
+            
+            // Show loading state
+            saveAssignMentor.textContent = 'Assigning...';
+            saveAssignMentor.disabled = true;
+            
+            // Call API
+            fetch(`${state.apiBaseUrl}/admin/assign-mentor`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    studentEmail: studentEmail,
+                    mentorName: mentorName
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Close modal
+                    closeAssignMentorModalFn();
+                    
+                    // Reload students
+                    loadStudents();
+                    
+                    // If on dashboard, reload recent students
+                    if (state.currentPage === 'dashboard') {
+                        loadRecentStudents();
+                    }
+                } else {
+                    alert(data.message || 'Failed to assign mentor. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error assigning mentor:', error);
+                alert('Failed to assign mentor. Please try again.');
+            })
+            .finally(() => {
+                // Reset loading state
+                saveAssignMentor.textContent = 'Assign';
+                saveAssignMentor.disabled = false;
+            });
+        }
+        
+        // Mentors Functions
+        function loadMentors() {
+            fetch(`${state.apiBaseUrl}/mentors`)
+                .then(response => response.json())
+                .then(mentors => {
+                    state.mentors = mentors;
+                    
+                    // Update mentors table
+                    const tbody = document.getElementById('mentors-table-body');
+                    tbody.innerHTML = '';
+                    
+                    mentors.forEach(mentor => {
+                        // Count students assigned to this mentor
+                        const studentsCount = state.students.filter(s => s.mentorName === mentor.name).length;
+                        
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${mentor.name}</td>
+                            <td>${mentor.email}</td>
+                            <td>${mentor.phone || 'N/A'}</td>
+                            <td>${mentor.specialization || 'N/A'}</td>
+                            <td>${studentsCount}</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn edit-btn" title="Edit" onclick="editMentor('${mentor.id}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete-btn" title="Delete" onclick="deleteMentor('${mentor.id}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(error => console.error('Error loading mentors:', error));
+        }
+        
+        function openAddMentorModal() {
+            // Reset form
+            mentorForm.reset();
+            mentorId.value = '';
+            
+            // Update modal title
+            mentorModalTitle.textContent = 'Add Mentor';
+            
+            // Show password field (required for new mentors)
+            mentorPassword.required = true;
+            mentorPassword.parentElement.querySelector('small').style.display = 'none';
+            
+            // Show modal
+            mentorModalBackdrop.style.display = 'flex';
+        }
+        
+        function editMentor(id) {
+            const mentor = state.mentors.find(m => m.id === id);
+            
+            if (mentor) {
+                // Fill form with mentor data
+                mentorId.value = mentor.id;
+                mentorName.value = mentor.name;
+                mentorEmail.value = mentor.email;
+                mentorPhone.value = mentor.phone || '';
+                mentorSpecialization.value = mentor.specialization || '';
+                mentorPassword.value = '';
+                
+                // Update modal title
+                mentorModalTitle.textContent = 'Edit Mentor';
+                
+                // Password is optional when editing
+                mentorPassword.required = false;
+                mentorPassword.parentElement.querySelector('small').style.display = 'block';
+                
+                // Show modal
+                mentorModalBackdrop.style.display = 'flex';
+            }
+        }
+        
+        function closeMentorModalFn() {
+            mentorModalBackdrop.style.display = 'none';
+        }
+        
+        function saveMentor() {
+            // Get form data
+            const mentor = {
+                name: mentorName.value,
+                email: mentorEmail.value,
+                phone: mentorPhone.value,
+                specialization: mentorSpecialization.value
+            };
+            
+            // Add password only if provided
+            if (mentorPassword.value) {
+                mentor.password = mentorPassword.value;
+            }
+            
+            // Determine if this is an add or update operation
+            const isUpdate = mentorId.value !== '';
+            const url = isUpdate 
+                ? `${state.apiBaseUrl}/mentors/${mentorId.value}`
+                : `${state.apiBaseUrl}/mentors`;
+            const method = isUpdate ? 'PUT' : 'POST';
+            
+            // If updating, add id to the object
+            if (isUpdate) {
+                mentor.id = mentorId.value;
+            }
+            
+            // Show loading state
+            saveMentorBtn.textContent = 'Saving...';
+            saveMentorBtn.disabled = true;
+            
+            // Call API
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(mentor)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Close modal
+                closeMentorModalFn();
+                
+                // Reload mentors
+                loadMentors();
+            })
+            .catch(error => {
+                console.error('Error saving mentor:', error);
+                alert('Failed to save mentor. Please try again.');
+            })
+            .finally(() => {
+                // Reset loading state
+                saveMentorBtn.textContent = 'Save';
+                saveMentorBtn.disabled = false;
+            });
+        }
+        
+        function deleteMentor(id) {
+            if (confirm('Are you sure you want to delete this mentor?')) {
+                fetch(`${state.apiBaseUrl}/mentors/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(() => {
+                    // Reload mentors
+                    loadMentors();
+                })
+                .catch(error => {
+                    console.error('Error deleting mentor:', error);
+                    alert('Failed to delete mentor. Please try again.');
+                });
+            }
+        }
+        
+        // Batches Functions
+        function loadBatches() {
+            fetch(`${state.apiBaseUrl}/batches`)
+                .then(response => response.json())
+                .then(batches => {
+                    state.batches = batches;
+                    
+                    // Update batches table
+                    const tbody = document.getElementById('batches-table-body');
+                    tbody.innerHTML = '';
+                    
+                    batches.forEach(batch => {
+                        // Count students in this batch
+                        const studentsCount = state.students.filter(s => s.batch === batch.name).length;
+                        
+                        // Determine status
+                        const today = new Date();
+                        const startDate = new Date(batch.startDate);
+                        const endDate = new Date(batch.endDate);
+                        
+                        let status = 'Upcoming';
+                        if (today >= startDate && today <= endDate) {
+                            status = 'Active';
+                        } else if (today > endDate) {
+                            status = 'Completed';
+                        }
+                        
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${batch.name}</td>
+                            <td>${formatDate(batch.startDate)}</td>
+                            <td>${formatDate(batch.endDate)}</td>
+                            <td>${studentsCount}</td>
+                            <td><span class="status-badge ${status.toLowerCase()}">${status}</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="action-btn edit-btn" title="Edit" onclick="editBatch('${batch.id}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(error => console.error('Error loading batches:', error));
+        }
+        
+        function openAddBatchModal() {
+            // Reset form
+            batchForm.reset();
+            batchId.value = '';
+            
+            // Set default dates
+            const today = new Date();
+            const nextMonth = new Date();
+            nextMonth.setMonth(today.getMonth() + 1);
+            
+            batchStartDate.value = formatDateForInput(today);
+            batchEndDate.value = formatDateForInput(nextMonth);
+            
+            // Update modal title
+            batchModalTitle.textContent = 'Add Batch';
+            
+            // Show modal
+            batchModalBackdrop.style.display = 'flex';
+        }
+        
+        function editBatch(id) {
+            const batch = state.batches.find(b => b.id === id);
+            
+            if (batch) {
+                // Fill form with batch data
+                batchId.value = batch.id;
+                batchName.value = batch.name;
+                batchStartDate.value = formatDateForInput(new Date(batch.startDate));
+                batchEndDate.value = formatDateForInput(new Date(batch.endDate));
+                batchDescription.value = batch.description || '';
+                
+                // Update modal title
+                batchModalTitle.textContent = 'Edit Batch';
+                
+                // Show modal
+                batchModalBackdrop.style.display = 'flex';
+            }
+        }
+        
+        function closeBatchModalFn() {
+            batchModalBackdrop.style.display = 'none';
+        }
+        
+       
+		
+		function saveBatch() {
+		    // Get form data
+		    const batch = {
+		        name: batchName.value,
+		        startDate: batchStartDate.value,
+		        endDate: batchEndDate.value,
+		        description: batchDescription.value
+		    };
+		    
+		    // Determine if this is an add or update operation
+		    const isUpdate = batchId.value !== '';
+		    const url = isUpdate 
+		        ? `${state.apiBaseUrl}/batches/${batchId.value}`
+		        : `${state.apiBaseUrl}/batches`;
+		    const method = isUpdate ? 'PUT' : 'POST';
+		    
+		    // If updating, add id to the object
+		    if (isUpdate) {
+		        batch.id = batchId.value;
+		    }
+		    
+		    // Validate dates
+		    if (new Date(batch.endDate) < new Date(batch.startDate)) {
+		        alert('End date must be after start date');
+		        return;
+		    }
+		    
+		    // Show loading state
+		    saveBatchBtn.textContent = 'Saving...';
+		    saveBatchBtn.disabled = true;
+		    
+		    // Call API
+		    fetch(url, {
+		        method: method,
+		        headers: {
+		            'Content-Type': 'application/json'
+		        },
+		        body: JSON.stringify(batch)
+		    })
+		    .then(response => response.json())
+		    .then(data => {
+		        // Close modal
+		        closeBatchModalFn();
+		        
+		        // Reload batches
+		        loadBatches();
+		    })
+		    .catch(error => {
+		        console.error('Error saving batch:', error);
+		        alert('Failed to save batch. Please try again.');
+		    })
+		    .finally(() => {
+		        // Reset loading state
+		        saveBatchBtn.textContent = 'Save';
+		        saveBatchBtn.disabled = false;
+		    });
+		}
+
+		// Helper functions
+		function formatDate(dateString) {
+		    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+		    return new Date(dateString).toLocaleDateString(undefined, options);
+		}
+
+		function formatDateForInput(date) {
+		    const d = new Date(date);
+		    let month = '' + (d.getMonth() + 1);
+		    let day = '' + d.getDate();
+		    const year = d.getFullYear();
+
+		    if (month.length < 2) 
+		        month = '0' + month;
+		    if (day.length < 2) 
+		        day = '0' + day;
+
+		    return [year, month, day].join('-');
+		}
+
+		// Make functions available globally for onclick attributes
+		window.editStudent = editStudent;
+		window.deleteStudent = deleteStudent;
+		window.openAssignMentorModal = openAssignMentorModal;
+		window.editMentor = editMentor;
+		window.deleteMentor = deleteMentor;
+		window.editBatch = editBatch;
+
+		// Initialize the application
+		checkAuth();
