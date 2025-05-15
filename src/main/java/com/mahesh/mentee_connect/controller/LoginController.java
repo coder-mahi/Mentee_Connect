@@ -9,6 +9,7 @@ import com.mahesh.mentee_connect.service.LoginService;
 
 @RestController
 @RequestMapping("/api/login")
+@CrossOrigin(origins = "http://localhost:3000") // Allow requests from the frontend
 public class LoginController {
 
     @Autowired

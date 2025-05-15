@@ -44,16 +44,17 @@ public class AdminController {
 	}
 	
 	
-	 @PostMapping("/assign-mentor")
-	    public ResponseEntity<Response> assignMentor(@RequestBody MentorAssignRequest request) {
-	        boolean assigned = studentService.assignMentor(request.getStudentEmail(), request.getMentorName());
-
-	        if (assigned) {
-	            return ResponseEntity.ok(new Response("Mentor assigned successfully", true));
-	        } else {
-	            return ResponseEntity.status(404).body(new Response("Student not found with given email", false));
-	        }
-	    }
+	@PostMapping("/assign-mentor")
+	public ResponseEntity<Response> assignMentor(@RequestBody MentorAssignRequest request) {
+		boolean assigned = studentService.assignMentor(request.getStudentEmail(), request.getMentorName());
+	
+		if (assigned) {
+			return ResponseEntity.ok(new Response("Mentor assigned successfully", true));
+		} else {
+			return ResponseEntity.status(404).body(new Response("Student not found with the given email", false));
+		}
+	}
+	
 	 
 	 
 	 @GetMapping("/students")

@@ -29,24 +29,24 @@ public class LoginService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    
     public Response login(String email, String password) {
-    	//admin login
-    	Admin admin = adminRepository.findByEmail(email);
-        if (admin != null && passwordEncoder.matches(password,admin.getPassword())) {
+        // Admin login
+        Admin admin = adminRepository.findByEmail(email);
+        if (admin != null && passwordEncoder.matches(password, admin.getPassword())) {
             return new Response("Admin Login Successful", true);
         }
 
-        //mentor login
-        Mentor mentor = mentorRepository.findByEmail(email);
-        if (mentor != null && passwordEncoder.matches(password, mentor.getPassword())) {
-            return new Response("Mentor Login Successful", true);
+        // Mentor login - using Optional
+        Optional<Mentor> optionalMentor = mentorRepository.findByEmail(email);
+        if (optionalMentor.isPresent()) {
+            Mentor mentor = optionalMentor.get();
+            if (passwordEncoder.matches(password, mentor.getPassword())) {
+                return new Response("Mentor Login Successful", true);
+            }
         }
 
-     // Find student by email
+        // Student login
         Optional<Student> optionalStudent = studentRepository.findByEmail(email);
-
-        // Check if student exists and password matches
         if (optionalStudent.isPresent()) {
             Student student = optionalStudent.get();
             if (passwordEncoder.matches(password, student.getPassword())) {

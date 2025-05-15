@@ -2,6 +2,7 @@ package com.mahesh.mentee_connect.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection = "students")
 public class Student {
@@ -9,6 +10,7 @@ public class Student {
     @Id
     private String id;
     private String name;
+    @Field("email")
     private String email;
     private String password;  // Added for login
     private String mentorName;
