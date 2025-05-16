@@ -1,76 +1,87 @@
 package com.mahesh.mentee_connect.controller;
 
-import com.mahesh.mentee_connect.exception.ResourceNotFoundException;
 import com.mahesh.mentee_connect.model.Mentor;
 import com.mahesh.mentee_connect.model.Student;
-import com.mahesh.mentee_connect.repository.MentorRepository;
-import com.mahesh.mentee_connect.repository.StudentRepository;
+import com.mahesh.mentee_connect.model.Meeting;
 import com.mahesh.mentee_connect.service.MentorService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import java.util.stream.Collectors;
-import com.mahesh.dto.*;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/mentors")
+@Tag(name = "Mentors", description = "Mentor management APIs")
 public class MentorController {
-
     @Autowired
     private MentorService mentorService;
 
-    @Autowired
-    private MentorRepository mentorRepository;
-
-    @Autowired
-    private StudentRepository studentRepository; // Changed from Student to StudentRepository
-
-    @GetMapping
-    public List<Mentor> getAllMentors() {
-        return mentorService.getAllMentors();
-    }
-
-    @GetMapping("/{id}")
-    public Mentor getMentor(@PathVariable String id) {
-        return mentorService.getMentorById(id);
-    }
-
     @PostMapping
-    public Mentor createMentor(@RequestBody Mentor mentor) {
-        return mentorService.addMentor(mentor);
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Create mentor", description = "Create a new mentor (Admin only)")
+    public ResponseEntity<Mentor> createMentor(@Valid @RequestBody Mentor mentor) {
+        return ResponseEntity.ok(mentorService.createMentor(mentor));
     }
 
     @PutMapping("/{id}")
-    public Mentor updateMentor(@PathVariable String id, @RequestBody Mentor mentor) {
-        return mentorService.updateMentor(id, mentor);
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isCurrentUser(#id)")
+    @Operation(summary = "Update mentor", description = "Update an existing mentor (Admin or self)")
+    public ResponseEntity<Mentor> updateMentor(@PathVariable String id, @Valid @RequestBody Mentor mentor) {
+        return ResponseEntity.ok(mentorService.updateMentor(id, mentor));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteMentor(@PathVariable String id) {
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Delete mentor", description = "Delete a mentor (Admin only)")
+    public ResponseEntity<?> deleteMentor(@PathVariable String id) {
         mentorService.deleteMentor(id);
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{mentorId}/my-mentees")
-    public ResponseEntity<List<StudentResponse>> getMyMentees(@PathVariable String mentorId) {
-        Mentor mentor = mentorRepository.findById(mentorId)
-            .orElseThrow(() -> new ResourceNotFoundException("Mentor not found with ID: " + mentorId));
-        
-        // Fetch all students allocated to the mentor
-        List<Student> students = studentRepository.findByMentorName(mentor.getName());
-        
-        // Mapping students to a response DTO
-        List<StudentResponse> response = students.stream()
-            .map(student -> new StudentResponse(
-                student.getName(),
-                student.getEmail()
-            ))
-            .collect(Collectors.toList());
-        
-        return ResponseEntity.ok(response);
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isCurrentUser(#id) or hasRole('STUDENT')")
+    @Operation(summary = "Get mentor", description = "Get mentor by ID (Admin, self, or student)")
+    public ResponseEntity<Mentor> getMentor(@PathVariable String id) {
+        return ResponseEntity.ok(mentorService.getMentorById(id));
     }
-     
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Get all mentors", description = "Get all mentors (Admin only)")
+    public ResponseEntity<List<Mentor>> getAllMentors() {
+        return ResponseEntity.ok(mentorService.getAllMentors());
+    }
+
+    @GetMapping("/{id}/students")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isCurrentUser(#id)")
+    @Operation(summary = "Get mentor's students", description = "Get all students assigned to a mentor (Admin or self)")
+    public ResponseEntity<List<Student>> getMentorStudents(@PathVariable String id) {
+        return ResponseEntity.ok(mentorService.getMentorStudents(id));
+    }
+
+    @GetMapping("/{id}/meetings")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isCurrentUser(#id)")
+    @Operation(summary = "Get mentor meetings", description = "Get all meetings for a mentor (Admin or self)")
+    public ResponseEntity<List<Meeting>> getMentorMeetings(@PathVariable String id) {
+        return ResponseEntity.ok(mentorService.getMentorMeetings(id));
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('MENTOR')")
+    @Operation(summary = "Get current mentor", description = "Get current logged-in mentor's details")
+    public ResponseEntity<Mentor> getCurrentMentor() {
+        return ResponseEntity.ok(mentorService.getCurrentMentor());
+    }
+
+    @GetMapping("/{id}/slots")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STUDENT')")
+    @Operation(summary = "Check mentor slots", description = "Check if mentor has available slots for new students")
+    public ResponseEntity<Boolean> hasAvailableSlots(@PathVariable String id) {
+        return ResponseEntity.ok(mentorService.hasAvailableSlots(id));
+    }
 }

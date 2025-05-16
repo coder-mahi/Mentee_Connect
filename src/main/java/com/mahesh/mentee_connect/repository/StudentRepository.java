@@ -1,13 +1,20 @@
+// StudentRepository.java
 package com.mahesh.mentee_connect.repository;
 
 import com.mahesh.mentee_connect.model.Student;
-
+import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
-
 public interface StudentRepository extends MongoRepository<Student, String> {
     Optional<Student> findByEmail(String email);
-    List<Student> findByMentorName(String mentorName);
+    Optional<Student> findByUsername(String username);
+    Optional<Student> findByStudentId(String studentId);
+    List<Student> findByAssignedMentorId(String mentorId);
+    List<Student> findByFirstNameContainingOrLastNameContainingOrEmailContaining(
+        String firstName, String lastName, String email);
+    List<Student> findByBatch(String batchName);
+    boolean existsByEmail(String email);
+    boolean existsByUsername(String username);
+    boolean existsByStudentId(String studentId);
 }

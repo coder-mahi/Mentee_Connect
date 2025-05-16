@@ -1,43 +1,33 @@
+// Admin.java
 package com.mahesh.mentee_connect.model;
 
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-@Document(collection = "admin")
-public class Admin {
-
-    @Id
-    private ObjectId id;
-    private String name;
-    private String email;
-    private String password;
-
-    public ObjectId getId() {
-        return id;
-    }
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@Document(collection = "admins")
+public class Admin extends User {
+    private String adminId;
+    private String department;
+    private String position;
     
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public String getEmail() {
-        return email;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    
-    public String getPassword() {
-        return password;
-    }
-    public void setPassword(String password) {
-        this.password = password;
+    public Admin(String username, String email, String password, String firstName, 
+                String lastName, String phoneNumber, String adminId, 
+                String department, String position) {
+        super();
+        this.setUsername(username);
+        this.setEmail(email);
+        this.setPassword(password);
+        this.setFirstName(firstName);
+        this.setLastName(lastName);
+        this.setPhoneNumber(phoneNumber);
+        this.setRole(UserRole.ROLE_ADMIN);
+        this.adminId = adminId;
+        this.department = department;
+        this.position = position;
     }
 }

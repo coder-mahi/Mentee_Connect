@@ -18,7 +18,7 @@ public class AdminService {
 		return adminRepository.findAll().stream().findFirst().orElse(null);
 	}
 	
-	public Admin updateAdmin(ObjectId id, Admin admin) {
+	public Admin updateAdmin(String id, Admin admin) {
 		admin.setId(id);
 		 if (admin.getPassword() != null && !admin.getPassword().isEmpty()) {
 			 admin.setPassword(passwordEncoder.encode(admin.getPassword()));

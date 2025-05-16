@@ -2,6 +2,7 @@ package com.mahesh.mentee_connect.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import java.time.LocalDate;
 
 @Document(collection = "batches")
 public class Batch {
@@ -11,6 +12,8 @@ public class Batch {
     private String batchName;
     private String course;
     private String mentorAssigned;
+    private LocalDate startDate;
+    private LocalDate endDate;
     
     // Constructors, Getters and Setters
     public Batch(String batchName, String course, String mentorAssigned) {
@@ -49,5 +52,21 @@ public class Batch {
 
     public void setMentorAssigned(String mentorAssigned) {
         this.mentorAssigned = mentorAssigned;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 }

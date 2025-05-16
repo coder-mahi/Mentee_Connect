@@ -1,50 +1,49 @@
+// Mentor.java
 package com.mahesh.mentee_connect.model;
 
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
 
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
 @Document(collection = "mentors")
-public class Mentor {
-
-    @Id
-    private String id;
-    private String name;
-    private String email;    // Added later for Loggin purpose
-    private String password; // Added later for Loggin purpose
-    private String expertise;
-
-    public String getId() {
-        return id;
-    }
-    public void setId(String id) {
-        this.id = id;
-    }
+public class Mentor extends User {
+    private String mentorId;
+    private String department;
+    private String specialization;
+    private String designation;
+    private int yearsOfExperience;
     
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
+    @DBRef(lazy = true)
+    private List<Student> assignedStudents = new ArrayList<>();
     
-    public String getEmail() {
-        return email;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    @DBRef(lazy = true)
+    private List<Meeting> scheduledMeetings = new ArrayList<>();
     
-    public String getPassword() {
-        return password;
-    }
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    private int maxStudents = 10;
     
-    public String getExpertise() {
-        return expertise;
-    }
-    public void setExpertise(String expertise) {
-        this.expertise = expertise;
+    public Mentor(String username, String email, String password, String firstName, 
+                 String lastName, String phoneNumber, String mentorId, 
+                 String department, String specialization, String designation, 
+                 int yearsOfExperience) {
+        super();
+        this.setUsername(username);
+        this.setEmail(email);
+        this.setPassword(password);
+        this.setFirstName(firstName);
+        this.setLastName(lastName);
+        this.setPhoneNumber(phoneNumber);
+        this.setRole(UserRole.ROLE_MENTOR);
+        this.mentorId = mentorId;
+        this.department = department;
+        this.specialization = specialization;
+        this.designation = designation;
+        this.yearsOfExperience = yearsOfExperience;
     }
 }
