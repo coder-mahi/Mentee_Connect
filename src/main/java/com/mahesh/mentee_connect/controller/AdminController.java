@@ -14,11 +14,22 @@ import com.mahesh.mentee_connect.payload.request.MentorAssignRequest;
 import com.mahesh.mentee_connect.service.BatchService;
 import com.mahesh.mentee_connect.service.MentorService;
 import com.mahesh.mentee_connect.service.StudentService;
+import com.mahesh.mentee_connect.dto.StudentDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/admin")
-@PreAuthorize("hasRole('ADMIN')")
+@RequestMapping("/admin")
+@Tag(name = "Admin", description = "Admin management APIs")
+@SecurityRequirement(name = "bearerAuth")
 public class AdminController {
 
     @Autowired
@@ -37,14 +48,18 @@ public class AdminController {
                 .body(studentService.createStudent(student));
     }
 
+    @Operation(summary = "Get all students", description = "Retrieve a list of all students")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved list",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = StudentDTO.class)))),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - Requires admin role")
+    })
     @GetMapping("/students")
-    public ResponseEntity<?> getAllStudents(
-            @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size) {
-        if (page != null && size != null) {
-            return ResponseEntity.ok(studentService.getAllStudents(page, size));
-        }
-        return ResponseEntity.ok(studentService.getAllStudents());
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<List<StudentDTO>> getAllStudents() {
+        List<StudentDTO> students = studentService.getAllStudentsAsDTO();
+        return ResponseEntity.ok(students);
     }
 
     @PutMapping("/students/{id}")

@@ -20,6 +20,8 @@ import java.util.List;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import java.time.LocalDateTime;
+import com.mahesh.mentee_connect.dto.StudentDTO;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -155,7 +157,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Student> getAllStudents(int page, int size) {
+    public Page<Student> getAllStudentsPageable(int page, int size) {
         return studentRepository.findAll(PageRequest.of(page, size));
     }
 
@@ -190,5 +192,27 @@ public class StudentServiceImpl implements StudentService {
         report.setAttendance(student.getAttendance());
         report.setCgpa(student.getCgpa());
         return List.of(report);
+    }
+
+    @Override
+    public List<StudentDTO> getAllStudentsAsDTO() {
+        return studentRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    private StudentDTO convertToDTO(Student student) {
+        return StudentDTO.builder()
+                .id(student.getId())
+                .username(student.getUsername())
+                .email(student.getEmail())
+                .firstName(student.getFirstName())
+                .lastName(student.getLastName())
+                .rollNumber(student.getStudentId())
+                .branch(student.getCourse())
+                .cgpa(student.getCgpa())
+                .mentorId(student.getAssignedMentor() != null ? student.getAssignedMentor().getId() : null)
+                .phoneNumber(student.getPhoneNumber())
+                .build();
     }
 } 

@@ -15,6 +15,10 @@ import com.mahesh.mentee_connect.service.AuthService;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -28,11 +32,17 @@ public class AuthController {
     @Autowired
     private JwtTokenProvider tokenProvider;
 
+    @Operation(summary = "Login user", description = "Authenticate a user and return JWT token")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully authenticated",
+                    content = @Content(schema = @Schema(implementation = JwtResponse.class))),
+        @ApiResponse(responseCode = "401", description = "Invalid credentials"),
+        @ApiResponse(responseCode = "400", description = "Invalid request")
+    })
     @PostMapping("/login")
-    @Operation(summary = "Authenticate user", description = "Authenticate a user and return JWT token")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        JwtResponse jwtResponse = authService.authenticateUser(loginRequest);
-        return ResponseEntity.ok(jwtResponse);
+    public ResponseEntity<JwtResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
+        JwtResponse response = authService.authenticateUser(loginRequest);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh-token")

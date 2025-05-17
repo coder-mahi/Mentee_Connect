@@ -11,9 +11,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
+    private static final Logger logger = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
+
     @Autowired
     private StudentRepository studentRepository;
 
@@ -25,15 +29,22 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = studentRepository.findByUsername(username)
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        logger.debug("Attempting to load user by email: {}", email);
+        
+        Optional<User> user = studentRepository.findByEmail(email)
                 .map(student -> (User) student)
-                .or(() -> mentorRepository.findByUsername(username)
+                .or(() -> mentorRepository.findByEmail(email)
                         .map(mentor -> (User) mentor))
-                .or(() -> adminRepository.findByUsername(username)
+                .or(() -> adminRepository.findByEmail(email)
                         .map(admin -> (User) admin));
 
-        return user.map(UserDetailsImpl::build)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+        if (user.isEmpty()) {
+            logger.error("User not found with email: {}", email);
+            throw new UsernameNotFoundException("User Not Found with email: " + email);
+        }
+
+        logger.debug("User found with email: {}, role: {}", email, user.get().getRole());
+        return UserDetailsImpl.build(user.get());
     }
 } 

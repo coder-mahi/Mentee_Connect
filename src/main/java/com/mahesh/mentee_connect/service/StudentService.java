@@ -7,6 +7,7 @@ import com.mahesh.mentee_connect.model.Meeting;
 import com.mahesh.mentee_connect.model.Student;
 import com.mahesh.mentee_connect.dto.MentorResponse;
 import com.mahesh.mentee_connect.dto.ProgressReport;
+import com.mahesh.mentee_connect.dto.StudentDTO;
 
 public interface StudentService {
     Student createStudent(Student student);
@@ -15,7 +16,7 @@ public interface StudentService {
     Student getStudentById(String id);
     Student getStudentByUsername(String username);
     List<Student> getAllStudents();
-    Page<Student> getAllStudents(int page, int size);
+    Page<Student> getAllStudentsPageable(int page, int size);
     List<Student> getStudentsByMentorId(String mentorId);
     List<Meeting> getStudentMeetings(String studentId);
     Student assignMentorToStudent(String studentId, String mentorId);
@@ -27,4 +28,5 @@ public interface StudentService {
     Student getStudentByEmail(String email);
     List<Student> searchStudents(String query);
     List<ProgressReport> getProgressReports(String studentId);
+    List<StudentDTO> getAllStudentsAsDTO();
 }
