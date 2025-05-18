@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.ArrayList;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,5 +65,23 @@ public class BatchService {
         batch.setCourse(batchDetails.getCourse());
         
         return batchRepository.save(batch);
+    }
+
+    @Transactional
+    public List<Student> assignStudentsToBatch(String batchId, List<String> studentIds) {
+        Batch batch = batchRepository.findById(batchId)
+                .orElseThrow(() -> new ResourceNotFoundException("Batch", "id", batchId));
+        
+        List<Student> updatedStudents = new ArrayList<>();
+        
+        for (String studentId : studentIds) {
+            Student student = studentRepository.findById(studentId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Student", "id", studentId));
+            
+            student.setBatch(batch.getBatchName());
+            updatedStudents.add(studentRepository.save(student));
+        }
+        
+        return updatedStudents;
     }
 }
