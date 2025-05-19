@@ -105,8 +105,22 @@ public class StudentServiceImpl implements StudentService {
         Mentor mentor = mentorRepository.findById(mentorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Mentor", "id", mentorId));
         
+        // Check if mentor has available slots
+        if (mentor.getAssignedStudents().size() >= mentor.getMaxStudents()) {
+            throw new RuntimeException("Mentor has reached maximum student capacity");
+        }
+
+        // Update student's mentor
         student.setAssignedMentor(mentor);
-        return studentRepository.save(student);
+        student = studentRepository.save(student);
+
+        // Update mentor's assigned students list
+        if (!mentor.getAssignedStudents().contains(student)) {
+            mentor.getAssignedStudents().add(student);
+            mentorRepository.save(mentor);
+        }
+
+        return student;
     }
 
     @Override

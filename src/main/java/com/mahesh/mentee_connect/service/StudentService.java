@@ -5,11 +5,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import com.mahesh.mentee_connect.model.Meeting;
 import com.mahesh.mentee_connect.model.Student;
+import com.mahesh.mentee_connect.model.Mentor;
 import com.mahesh.mentee_connect.dto.MentorResponse;
 import com.mahesh.mentee_connect.dto.ProgressReport;
 import com.mahesh.mentee_connect.dto.StudentDTO;
+import com.mahesh.mentee_connect.repository.StudentRepository;
+import com.mahesh.mentee_connect.repository.MentorRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface StudentService {
+
     Student createStudent(Student student);
     Student updateStudent(String id, Student studentDetails);
     void deleteStudent(String id);
@@ -24,9 +31,9 @@ public interface StudentService {
     Student getCurrentStudent();
     Student getCurrentStudent(Authentication authentication);
     MentorResponse getMentorResponseByStudentId(String studentId);
-    MentorResponse getMyMentor(String studentId);
     Student getStudentByEmail(String email);
     List<Student> searchStudents(String query);
+    MentorResponse getMyMentor(String studentId);
     List<ProgressReport> getProgressReports(String studentId);
     List<StudentDTO> getAllStudentsAsDTO();
 }
