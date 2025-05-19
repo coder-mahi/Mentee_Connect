@@ -5,7 +5,7 @@ import com.mahesh.mentee_connect.model.Mentor;
 import com.mahesh.mentee_connect.model.Student;
 import com.mahesh.mentee_connect.model.User;
 import com.mahesh.mentee_connect.payload.response.UserResponse;
-import com.mahesh.mentee_connect.payload.request.UpdateUserRequest;
+import com.mahesh.mentee_connect.payload.request.UpdateProfileRequest;
 import com.mahesh.mentee_connect.service.UserManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -65,7 +65,7 @@ public class AdminUserManagementController {
     @PutMapping("/{userId}")
     public ResponseEntity<?> updateUser(
             @PathVariable String userId,
-            @Valid @RequestBody UpdateUserRequest updateRequest) {
+            @Valid @RequestBody UpdateProfileRequest updateRequest) {
         try {
             logger.info("Attempting to update user with ID: {}", userId);
             User updatedUser = userManagementService.updateUser(userId, updateRequest);

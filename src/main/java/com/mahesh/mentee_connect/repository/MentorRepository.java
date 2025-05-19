@@ -14,4 +14,6 @@ public interface MentorRepository extends MongoRepository<Mentor, String> {
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
     boolean existsByMentorId(String mentorId);
+    List<Mentor> findByFirstNameContainingOrLastNameContainingOrEmailContaining(
+        String firstName, String lastName, String email);
 }
