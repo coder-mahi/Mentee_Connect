@@ -29,22 +29,33 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        logger.debug("Attempting to load user by email: {}", email);
+    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
+        logger.debug("Attempting to load user by username/email: {}", usernameOrEmail);
         
-        Optional<User> user = studentRepository.findByEmail(email)
+        // Try to find by email first
+        Optional<User> user = studentRepository.findByEmail(usernameOrEmail)
                 .map(student -> (User) student)
-                .or(() -> mentorRepository.findByEmail(email)
+                .or(() -> mentorRepository.findByEmail(usernameOrEmail)
                         .map(mentor -> (User) mentor))
-                .or(() -> adminRepository.findByEmail(email)
+                .or(() -> adminRepository.findByEmail(usernameOrEmail)
                         .map(admin -> (User) admin));
-
+                    
+        // If not found by email, try by username
         if (user.isEmpty()) {
-            logger.error("User not found with email: {}", email);
-            throw new UsernameNotFoundException("User Not Found with email: " + email);
+            user = studentRepository.findByUsername(usernameOrEmail)
+                    .map(student -> (User) student)
+                    .or(() -> mentorRepository.findByUsername(usernameOrEmail)
+                            .map(mentor -> (User) mentor))
+                    .or(() -> adminRepository.findByUsername(usernameOrEmail)
+                            .map(admin -> (User) admin));
         }
 
-        logger.debug("User found with email: {}, role: {}", email, user.get().getRole());
+        if (user.isEmpty()) {
+            logger.error("User not found with username/email: {}", usernameOrEmail);
+            throw new UsernameNotFoundException("User Not Found with username/email: " + usernameOrEmail);
+        }
+
+        logger.debug("User found with username/email: {}, role: {}", usernameOrEmail, user.get().getRole());
         return UserDetailsImpl.build(user.get());
     }
 } 

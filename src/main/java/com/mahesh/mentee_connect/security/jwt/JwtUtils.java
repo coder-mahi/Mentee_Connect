@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import com.mahesh.mentee_connect.security.services.UserDetailsImpl;
+import io.jsonwebtoken.io.Decoders;
 
 @Component
 public class JwtUtils {
@@ -79,6 +80,7 @@ public class JwtUtils {
     }
 
     private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }

@@ -62,19 +62,25 @@ public class SecurityConfig {
     
     @Bean
 public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.cors(cors -> cors.configurationSource(corsConfigurationSource()))  // Add this line
+    http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .csrf(csrf -> csrf.disable())
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> 
             auth.requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/api-docs/**", "/api-docs/**").permitAll()
-                .requestMatchers("/api/swagger-ui/**", "/swagger-ui/**").permitAll()
-                .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
-                .requestMatchers("/api/mentor/**").hasAuthority("ROLE_MENTOR")
-                .requestMatchers("/api/student/**").hasAuthority("ROLE_STUDENT")
-                .requestMatchers("/api/batches/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers("/api-docs/**", "/api-docs/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/swagger-ui/**").permitAll()
+                .requestMatchers("/notifications/auth-test").permitAll()
+                .requestMatchers("/notifications/auth-status").permitAll()
+                .requestMatchers("/notifications/admin/**").hasRole("ADMIN")
+                .requestMatchers("/notifications/my-notifications").authenticated()
+                .requestMatchers("/notifications/unread").authenticated()
+                .requestMatchers("/notifications/{id}/read").authenticated()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/mentor/**").hasRole("MENTOR")
+                .requestMatchers("/student/**").hasRole("STUDENT")
+                .requestMatchers("/batches/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
         );
 
