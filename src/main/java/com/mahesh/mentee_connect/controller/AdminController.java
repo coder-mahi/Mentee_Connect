@@ -24,6 +24,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
+import com.mahesh.mentee_connect.dto.BatchAssignmentRequest;
+import jakarta.validation.Valid;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -108,5 +110,25 @@ public class AdminController {
     @GetMapping("/batches/{id}/students")
     public ResponseEntity<List<Student>> getBatchStudents(@PathVariable String id) {
         return ResponseEntity.ok(batchService.getBatchStudents(id));
+    }
+
+    @PostMapping("/batches/assign-students")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Assign multiple students to a batch", 
+               description = "Assign a list of students to a specific batch")
+    public ResponseEntity<?> assignStudentsToBatch(
+            @Valid @RequestBody BatchAssignmentRequest request) {
+        try {
+            List<Student> updatedStudents = batchService.assignStudentsToBatch(
+                request.getBatchId(), 
+                request.getStudentIds()
+            );
+            return ResponseEntity.ok(new Response(
+                "Successfully assigned " + updatedStudents.size() + " students to batch", 
+                true
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
     }
 }

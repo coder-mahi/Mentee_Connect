@@ -70,18 +70,19 @@ public class BatchService {
     @Transactional
     public List<Student> assignStudentsToBatch(String batchId, List<String> studentIds) {
         Batch batch = batchRepository.findById(batchId)
-                .orElseThrow(() -> new ResourceNotFoundException("Batch", "id", batchId));
-        
-        List<Student> updatedStudents = new ArrayList<>();
-        
+            .orElseThrow(() -> new RuntimeException("Batch not found with id: " + batchId));
+
+        List<Student> students = new ArrayList<>();
         for (String studentId : studentIds) {
             Student student = studentRepository.findById(studentId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Student", "id", studentId));
+                .orElseThrow(() -> new RuntimeException("Student not found with id: " + studentId));
             
+            // Update student's batch information
             student.setBatch(batch.getBatchName());
-            updatedStudents.add(studentRepository.save(student));
+            student = studentRepository.save(student);
+            students.add(student);
         }
-        
-        return updatedStudents;
+
+        return students;
     }
 }
