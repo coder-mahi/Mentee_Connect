@@ -13,8 +13,8 @@ public class Batch {
     private String id;
     private String batchName;
     private String course;
-    private String mentorAssigned; // Keeping for backward compatibility
-    private List<String> mentorsAssigned = new ArrayList<>(); // New field for multiple mentors
+    private List<String> mentorsAssigned = new ArrayList<>(); // Mentors assigned to this batch
+    private List<String> studentsAssigned = new ArrayList<>(); // Students assigned to this batch
     private LocalDate startDate;
     private LocalDate endDate;
     
@@ -23,12 +23,17 @@ public class Batch {
         // Default constructor
     }
     
-    public Batch(String batchName, String course, String mentorAssigned) {
+    public Batch(String batchName, String course) {
         this.batchName = batchName;
         this.course = course;
-        this.mentorAssigned = mentorAssigned;
-        if (mentorAssigned != null) {
-            this.mentorsAssigned.add(mentorAssigned);
+    }
+    
+    // Constructor for backward compatibility
+    public Batch(String batchName, String course, String mentorId) {
+        this.batchName = batchName;
+        this.course = course;
+        if (mentorId != null) {
+            this.mentorsAssigned.add(mentorId);
         }
     }
 
@@ -55,16 +60,16 @@ public class Batch {
     public void setCourse(String course) {
         this.course = course;
     }
-
+    
+    // For backward compatibility
     public String getMentorAssigned() {
-        return mentorAssigned;
+        return !mentorsAssigned.isEmpty() ? mentorsAssigned.get(0) : null;
     }
 
-    public void setMentorAssigned(String mentorAssigned) {
-        this.mentorAssigned = mentorAssigned;
-        // Also update the list for new code
-        if (mentorAssigned != null && !mentorsAssigned.contains(mentorAssigned)) {
-            this.mentorsAssigned.add(mentorAssigned);
+    // For backward compatibility
+    public void setMentorAssigned(String mentorId) {
+        if (mentorId != null && !mentorsAssigned.contains(mentorId)) {
+            this.mentorsAssigned.add(mentorId);
         }
     }
     
@@ -73,11 +78,15 @@ public class Batch {
     }
     
     public void setMentorsAssigned(List<String> mentorsAssigned) {
-        this.mentorsAssigned = mentorsAssigned;
-        // Update the single mentor field for backward compatibility
-        if (mentorsAssigned != null && !mentorsAssigned.isEmpty()) {
-            this.mentorAssigned = mentorsAssigned.get(0);
-        }
+        this.mentorsAssigned = mentorsAssigned != null ? mentorsAssigned : new ArrayList<>();
+    }
+
+    public List<String> getStudentsAssigned() {
+        return studentsAssigned;
+    }
+    
+    public void setStudentsAssigned(List<String> studentsAssigned) {
+        this.studentsAssigned = studentsAssigned;
     }
 
     public LocalDate getStartDate() {

@@ -36,6 +36,12 @@ public class BatchService {
         return batchRepository.findAll(PageRequest.of(page, size));
     }
 
+    @Transactional(readOnly = true)
+    public Batch getBatchById(String id) {
+        return batchRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Batch", "id", id));
+    }
+
     @Transactional
     public Batch assignMentorToBatch(String batchId, String mentorId) {
         Batch batch = batchRepository.findById(batchId)
@@ -43,7 +49,11 @@ public class BatchService {
         Mentor mentor = mentorRepository.findById(mentorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Mentor", "id", mentorId));
         
-        batch.setMentorAssigned(mentorId);
+        // Add the mentor ID to the mentorsAssigned list if not already present
+        if (!batch.getMentorsAssigned().contains(mentorId)) {
+            batch.getMentorsAssigned().add(mentorId);
+        }
+        
         return batchRepository.save(batch);
     }
 
@@ -81,7 +91,15 @@ public class BatchService {
             student.setBatch(batch.getBatchName());
             student = studentRepository.save(student);
             students.add(student);
+            
+            // Add student ID to the batch's studentsAssigned list if not already present
+            if (!batch.getStudentsAssigned().contains(studentId)) {
+                batch.getStudentsAssigned().add(studentId);
+            }
         }
+        
+        // Save the updated batch
+        batchRepository.save(batch);
 
         return students;
     }
@@ -93,19 +111,11 @@ public class BatchService {
         
         List<Mentor> mentors = new ArrayList<>();
         
-        // Check for mentors in the new field first
         if (batch.getMentorsAssigned() != null && !batch.getMentorsAssigned().isEmpty()) {
             for (String mentorId : batch.getMentorsAssigned()) {
                 mentorRepository.findById(mentorId)
                     .ifPresent(mentors::add);
             }
-            return mentors;
-        }
-        
-        // Fallback to legacy field
-        if (batch.getMentorAssigned() != null) {
-            mentorRepository.findById(batch.getMentorAssigned())
-                    .ifPresent(mentors::add);
         }
         
         return mentors;

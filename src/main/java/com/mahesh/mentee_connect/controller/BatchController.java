@@ -47,6 +47,17 @@ public class BatchController {
         return ResponseEntity.ok(batchService.getAllBatches(page, size));
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Get batch by ID", description = "Retrieve details of a specific batch by its ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved batch"),
+        @ApiResponse(responseCode = "404", description = "Batch not found")
+    })
+    public ResponseEntity<Batch> getBatchById(@PathVariable String id) {
+        Batch batch = batchService.getBatchById(id);
+        return ResponseEntity.ok(batch);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Batch> updateBatch(
             @PathVariable String id,
