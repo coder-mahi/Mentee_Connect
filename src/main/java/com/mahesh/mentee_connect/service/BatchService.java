@@ -85,4 +85,49 @@ public class BatchService {
 
         return students;
     }
+    
+    @Transactional(readOnly = true)
+    public List<Mentor> getBatchMentors(String batchId) {
+        Batch batch = batchRepository.findById(batchId)
+                .orElseThrow(() -> new ResourceNotFoundException("Batch", "id", batchId));
+        
+        List<Mentor> mentors = new ArrayList<>();
+        
+        // Check for mentors in the new field first
+        if (batch.getMentorsAssigned() != null && !batch.getMentorsAssigned().isEmpty()) {
+            for (String mentorId : batch.getMentorsAssigned()) {
+                mentorRepository.findById(mentorId)
+                    .ifPresent(mentors::add);
+            }
+            return mentors;
+        }
+        
+        // Fallback to legacy field
+        if (batch.getMentorAssigned() != null) {
+            mentorRepository.findById(batch.getMentorAssigned())
+                    .ifPresent(mentors::add);
+        }
+        
+        return mentors;
+    }
+    
+    @Transactional
+    public Batch assignMentorsToBatch(String batchId, List<String> mentorIds) {
+        Batch batch = batchRepository.findById(batchId)
+                .orElseThrow(() -> new ResourceNotFoundException("Batch", "id", batchId));
+        
+        // Validate that all mentors exist
+        List<Mentor> mentors = new ArrayList<>();
+        for (String mentorId : mentorIds) {
+            Mentor mentor = mentorRepository.findById(mentorId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Mentor", "id", mentorId));
+            mentors.add(mentor);
+        }
+        
+        // Set the mentors
+        batch.setMentorsAssigned(mentorIds);
+        
+        // Save and return the updated batch
+        return batchRepository.save(batch);
+    }
 }
