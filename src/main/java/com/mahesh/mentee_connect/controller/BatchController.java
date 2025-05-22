@@ -59,9 +59,15 @@ public class BatchController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update batch information", description = "Update details of a specific batch by its ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully updated batch"),
+        @ApiResponse(responseCode = "404", description = "Batch not found"),
+        @ApiResponse(responseCode = "400", description = "Invalid batch data provided")
+    })
     public ResponseEntity<Batch> updateBatch(
             @PathVariable String id,
-            @RequestBody Batch batch) {
+            @Valid @RequestBody Batch batch) {
         return ResponseEntity.ok(batchService.updateBatch(id, batch));
     }
 

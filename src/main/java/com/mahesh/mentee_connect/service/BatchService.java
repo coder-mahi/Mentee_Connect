@@ -74,6 +74,16 @@ public class BatchService {
         batch.setEndDate(batchDetails.getEndDate());
         batch.setCourse(batchDetails.getCourse());
         
+        // Update mentors assigned if provided
+        if (batchDetails.getMentorsAssigned() != null) {
+            batch.setMentorsAssigned(batchDetails.getMentorsAssigned());
+        }
+        
+        // Update students assigned if provided
+        if (batchDetails.getStudentsAssigned() != null) {
+            batch.setStudentsAssigned(batchDetails.getStudentsAssigned());
+        }
+        
         return batchRepository.save(batch);
     }
 
