@@ -4,18 +4,21 @@ import com.mahesh.mentee_connect.model.Mentor;
 import com.mahesh.mentee_connect.model.Student;
 import com.mahesh.mentee_connect.model.Meeting;
 import com.mahesh.mentee_connect.service.MentorService;
+import com.mahesh.mentee_connect.dto.MenteeUpdateRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/mentors")
+@RequestMapping("/mentors")
 @Tag(name = "Mentors", description = "Mentor management APIs")
 public class MentorController {
     @Autowired
@@ -83,5 +86,22 @@ public class MentorController {
     @Operation(summary = "Check mentor slots", description = "Check if mentor has available slots for new students")
     public ResponseEntity<Boolean> hasAvailableSlots(@PathVariable String id) {
         return ResponseEntity.ok(mentorService.hasAvailableSlots(id));
+    }
+
+    @PutMapping("/{mentorId}/students/{studentId}")
+    @PreAuthorize("hasRole('MENTOR') and @securityService.isCurrentUser(#mentorId)")
+    @Operation(summary = "Update mentee information", description = "Update information for a mentee assigned to this mentor")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Student information updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @ApiResponse(responseCode = "403", description = "Forbidden"),
+        @ApiResponse(responseCode = "404", description = "Mentor or student not found")
+    })
+    public ResponseEntity<Student> updateStudentAsMentor(
+            @PathVariable String mentorId,
+            @PathVariable String studentId,
+            @Valid @RequestBody MenteeUpdateRequest updateRequest) {
+        return ResponseEntity.ok(mentorService.updateStudentAsMentor(mentorId, studentId, updateRequest));
     }
 }

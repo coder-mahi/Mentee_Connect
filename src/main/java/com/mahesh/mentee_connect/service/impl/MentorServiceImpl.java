@@ -8,6 +8,8 @@ import com.mahesh.mentee_connect.repository.StudentRepository;
 import com.mahesh.mentee_connect.repository.MeetingRepository;
 import com.mahesh.mentee_connect.service.MentorService;
 import com.mahesh.mentee_connect.exception.ResourceNotFoundException;
+import com.mahesh.mentee_connect.exception.UnauthorizedException;
+import com.mahesh.mentee_connect.dto.MenteeUpdateRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -96,8 +98,17 @@ public class MentorServiceImpl implements MentorService {
     @Override
     @Transactional(readOnly = true)
     public Mentor getCurrentMentor() {
-        // This will be implemented using SecurityContext in the actual implementation
-        throw new UnsupportedOperationException("Method not implemented yet");
+        // Get the authenticated user from the SecurityContext
+        org.springframework.security.core.Authentication authentication = 
+            org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new UnauthorizedException("User not authenticated");
+        }
+        
+        String username = authentication.getName();
+        return mentorRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Mentor", "username", username));
     }
 
     @Override
@@ -117,5 +128,44 @@ public class MentorServiceImpl implements MentorService {
     @Transactional(readOnly = true)
     public Page<Mentor> getAllMentors(int page, int size) {
         return mentorRepository.findAll(PageRequest.of(page, size));
+    }
+
+    @Override
+    @Transactional
+    public Student updateStudentAsMentor(String mentorId, String studentId, MenteeUpdateRequest updateRequest) {
+        // Verify mentor exists
+        Mentor mentor = getMentorById(mentorId);
+        
+        // Get the student
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student", "id", studentId));
+        
+        // Verify that this student is assigned to this mentor
+        if (student.getAssignedMentor() == null || !student.getAssignedMentor().getId().equals(mentorId)) {
+            throw new UnauthorizedException("This mentor is not authorized to update this student's information");
+        }
+        
+        // Update allowed fields only
+        if (updateRequest.getFirstName() != null) {
+            student.setFirstName(updateRequest.getFirstName());
+        }
+        if (updateRequest.getLastName() != null) {
+            student.setLastName(updateRequest.getLastName());
+        }
+        if (updateRequest.getPhoneNumber() != null) {
+            student.setPhoneNumber(updateRequest.getPhoneNumber());
+        }
+        if (updateRequest.getCourse() != null) {
+            student.setCourse(updateRequest.getCourse());
+        }
+        if (updateRequest.getSemester() != null) {
+            student.setSemester(updateRequest.getSemester());
+        }
+        if (updateRequest.getCgpa() != null) {
+            student.setCgpa(updateRequest.getCgpa());
+        }
+        
+        // Save and return updated student
+        return studentRepository.save(student);
     }
 } 
