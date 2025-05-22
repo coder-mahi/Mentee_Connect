@@ -22,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.time.LocalDateTime;
 import com.mahesh.mentee_connect.dto.StudentDTO;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -228,5 +229,43 @@ public class StudentServiceImpl implements StudentService {
                 .mentorId(student.getAssignedMentor() != null ? student.getAssignedMentor().getId() : null)
                 .phoneNumber(student.getPhoneNumber())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public List<Student> assignMentorToMultipleStudents(List<String> studentIds, String mentorId) {
+        Mentor mentor = mentorRepository.findById(mentorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Mentor", "id", mentorId));
+        
+        // Check if mentor has enough available slots
+        int currentAssignedCount = mentor.getAssignedStudents().size();
+        int requestedAssignments = studentIds.size();
+        
+        if (currentAssignedCount + requestedAssignments > mentor.getMaxStudents()) {
+            throw new RuntimeException("Mentor does not have enough available slots. " +
+                    "Current: " + currentAssignedCount + ", Requested: " + requestedAssignments + 
+                    ", Maximum: " + mentor.getMaxStudents());
+        }
+
+        List<Student> updatedStudents = new ArrayList<>();
+        
+        for (String studentId : studentIds) {
+            Student student = getStudentById(studentId);
+            
+            // Update student's mentor
+            student.setAssignedMentor(mentor);
+            student = studentRepository.save(student);
+            updatedStudents.add(student);
+
+            // Add student to mentor's assigned students list if not already there
+            if (!mentor.getAssignedStudents().contains(student)) {
+                mentor.getAssignedStudents().add(student);
+            }
+        }
+        
+        // Save the mentor with updated student list
+        mentorRepository.save(mentor);
+        
+        return updatedStudents;
     }
 } 

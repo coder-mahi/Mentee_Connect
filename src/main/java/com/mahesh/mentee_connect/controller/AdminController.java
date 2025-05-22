@@ -12,6 +12,8 @@ import com.mahesh.mentee_connect.payload.request.MentorAssignRequest;
 import com.mahesh.mentee_connect.service.MentorService;
 import com.mahesh.mentee_connect.service.StudentService;
 import com.mahesh.mentee_connect.dto.StudentDTO;
+import com.mahesh.mentee_connect.dto.MentorDTO;
+import com.mahesh.mentee_connect.dto.MentorConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,6 +37,9 @@ public class AdminController {
     
     @Autowired
     private MentorService mentorService;
+    
+    @Autowired
+    private MentorConverter mentorConverter;
 
     // Student Management
     @PostMapping("/students")
@@ -78,18 +83,27 @@ public class AdminController {
     }
 
     @GetMapping("/mentors")
-    public ResponseEntity<Page<Mentor>> getAllMentors(
+    public ResponseEntity<?> getAllMentors(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(mentorService.getAllMentors(page, size));
+        Page<Mentor> mentorsPage = mentorService.getAllMentors(page, size);
+        Page<MentorDTO> mentorDTOs = mentorsPage.map(mentor -> mentorConverter.convertToDTO(mentor));
+        return ResponseEntity.ok(mentorDTOs);
+    }
+
+    @GetMapping("/mentors/{id}")
+    public ResponseEntity<?> getMentorById(@PathVariable String id) {
+        Mentor mentor = mentorService.getMentorById(id);
+        MentorDTO dto = mentorConverter.convertToDTO(mentor);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping("/assign-mentor")
-    public ResponseEntity<?> assignMentor(@RequestBody MentorAssignRequest request) {
-        Student updatedStudent = studentService.assignMentorToStudent(
-            request.getStudentId(), 
+    public ResponseEntity<?> assignMentor(@Valid @RequestBody MentorAssignRequest request) {
+        List<Student> updatedStudents = studentService.assignMentorToMultipleStudents(
+            request.getStudentIds(), 
             request.getMentorId()
         );
-        return ResponseEntity.ok(new Response("Mentor assigned successfully", true));
+        return ResponseEntity.ok(new Response("Successfully assigned " + updatedStudents.size() + " students to mentor", true));
     }
 }

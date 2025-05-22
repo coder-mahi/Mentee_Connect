@@ -27,6 +27,7 @@ public interface StudentService {
     List<Student> getStudentsByMentorId(String mentorId);
     List<Meeting> getStudentMeetings(String studentId);
     Student assignMentorToStudent(String studentId, String mentorId);
+    List<Student> assignMentorToMultipleStudents(List<String> studentIds, String mentorId);
     Student updateStudentProgress(String studentId, double attendance, double cgpa);
     Student getCurrentStudent();
     Student getCurrentStudent(Authentication authentication);
