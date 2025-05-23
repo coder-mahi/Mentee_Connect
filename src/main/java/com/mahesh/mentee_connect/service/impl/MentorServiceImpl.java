@@ -3,13 +3,14 @@ package com.mahesh.mentee_connect.service.impl;
 import com.mahesh.mentee_connect.model.Mentor;
 import com.mahesh.mentee_connect.model.Student;
 import com.mahesh.mentee_connect.model.Meeting;
+import com.mahesh.mentee_connect.dto.MenteeUpdateRequest;
+import com.mahesh.mentee_connect.dto.StudentMentorDTO;
 import com.mahesh.mentee_connect.repository.MentorRepository;
 import com.mahesh.mentee_connect.repository.StudentRepository;
 import com.mahesh.mentee_connect.repository.MeetingRepository;
 import com.mahesh.mentee_connect.service.MentorService;
 import com.mahesh.mentee_connect.exception.ResourceNotFoundException;
 import com.mahesh.mentee_connect.exception.UnauthorizedException;
-import com.mahesh.mentee_connect.dto.MenteeUpdateRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MentorServiceImpl implements MentorService {
@@ -85,8 +87,24 @@ public class MentorServiceImpl implements MentorService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Student> getMentorStudents(String mentorId) {
-        return studentRepository.findByAssignedMentorId(mentorId);
+    public List<StudentMentorDTO> getMentorStudents(String mentorId) {
+        List<Student> students = studentRepository.findByAssignedMentorId(mentorId);
+        return students.stream()
+                .map(student -> new StudentMentorDTO(
+                    student.getId(),
+                    student.getUsername(),
+                    student.getEmail(),
+                    student.getFirstName(),
+                    student.getLastName(),
+                    student.getPhoneNumber(),
+                    student.getStudentId(),
+                    student.getCourse(),
+                    student.getBatch(),
+                    student.getSemester(),
+                    student.getAttendance(),
+                    student.getCgpa(),
+                    mentorId))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -167,5 +185,93 @@ public class MentorServiceImpl implements MentorService {
         
         // Save and return updated student
         return studentRepository.save(student);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public StudentMentorDTO getMenteeDetails(String mentorId, String studentId) {
+        // Verify mentor exists
+        Mentor mentor = getMentorById(mentorId);
+        
+        // Get the student
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student", "id", studentId));
+        
+        // Verify that this student is assigned to this mentor
+        if (student.getAssignedMentor() == null || !student.getAssignedMentor().getId().equals(mentorId)) {
+            throw new UnauthorizedException("This student is not assigned to the specified mentor");
+        }
+        
+        return new StudentMentorDTO(
+            student.getId(),
+            student.getUsername(),
+            student.getEmail(),
+            student.getFirstName(),
+            student.getLastName(),
+            student.getPhoneNumber(),
+            student.getStudentId(),
+            student.getCourse(),
+            student.getBatch(),
+            student.getSemester(),
+            student.getAttendance(),
+            student.getCgpa(),
+            mentorId
+        );
+    }
+
+    @Override
+    @Transactional
+    public StudentMentorDTO updateMenteeDetails(String mentorId, String studentId, MenteeUpdateRequest updateRequest) {
+        // Verify mentor exists
+        Mentor mentor = getMentorById(mentorId);
+        
+        // Get the student
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student", "id", studentId));
+        
+        // Verify that this student is assigned to this mentor
+        if (student.getAssignedMentor() == null || !student.getAssignedMentor().getId().equals(mentorId)) {
+            throw new UnauthorizedException("This mentor is not authorized to update this student's information");
+        }
+        
+        // Update allowed fields only
+        if (updateRequest.getFirstName() != null) {
+            student.setFirstName(updateRequest.getFirstName());
+        }
+        if (updateRequest.getLastName() != null) {
+            student.setLastName(updateRequest.getLastName());
+        }
+        if (updateRequest.getPhoneNumber() != null) {
+            student.setPhoneNumber(updateRequest.getPhoneNumber());
+        }
+        if (updateRequest.getCourse() != null) {
+            student.setCourse(updateRequest.getCourse());
+        }
+        if (updateRequest.getSemester() != null) {
+            student.setSemester(updateRequest.getSemester());
+        }
+        if (updateRequest.getCgpa() != null) {
+            student.setCgpa(updateRequest.getCgpa());
+        }
+        
+        // Save the updated student
+        student = studentRepository.save(student);
+        
+        // Return the updated student as DTO
+        return new StudentMentorDTO(
+            student.getId(),
+            student.getUsername(),
+            student.getEmail(),
+            student.getFirstName(),
+            student.getLastName(),
+            student.getPhoneNumber(),
+            student.getStudentId(),
+            student.getCourse(),
+            student.getBatch(),
+            student.getSemester(),
+            student.getAttendance(),
+            student.getCgpa(),
+            mentorId
+        );
     }
 } 

@@ -4,6 +4,7 @@ import com.mahesh.mentee_connect.model.Mentor;
 import com.mahesh.mentee_connect.model.Student;
 import com.mahesh.mentee_connect.model.Meeting;
 import com.mahesh.mentee_connect.dto.MenteeUpdateRequest;
+import com.mahesh.mentee_connect.dto.StudentMentorDTO;
 import org.springframework.data.domain.Page;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface MentorService {
     Mentor getMentorById(String id);
     Mentor getMentorByUsername(String username);
     List<Mentor> getAllMentors();
-    List<Student> getMentorStudents(String mentorId);
+    List<StudentMentorDTO> getMentorStudents(String mentorId);
     List<Meeting> getMentorMeetings(String mentorId);
     Mentor getCurrentMentor();
     boolean hasAvailableSlots(String mentorId);
@@ -23,4 +24,8 @@ public interface MentorService {
     
     // New method for updating student information by mentor
     Student updateStudentAsMentor(String mentorId, String studentId, MenteeUpdateRequest updateRequest);
+    
+    // New methods for specific mentee operations
+    StudentMentorDTO getMenteeDetails(String mentorId, String studentId);
+    StudentMentorDTO updateMenteeDetails(String mentorId, String studentId, MenteeUpdateRequest updateRequest);
 } 
