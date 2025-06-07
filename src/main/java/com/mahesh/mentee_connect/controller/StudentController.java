@@ -3,13 +3,14 @@ package com.mahesh.mentee_connect.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import com.mahesh.mentee_connect.dto.MentorResponse;
-import com.mahesh.mentee_connect.dto.MeetingChangeRequest;
-import com.mahesh.mentee_connect.dto.ProgressReport;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.mahesh.mentee_connect.dto.*;
 import com.mahesh.mentee_connect.model.Meeting;
 import com.mahesh.mentee_connect.model.Student;
 import com.mahesh.mentee_connect.service.MeetingService;
@@ -17,12 +18,17 @@ import com.mahesh.mentee_connect.service.StudentService;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/students")
+@RequestMapping("/students")
 @Tag(name = "Students", description = "Student management APIs")
 public class StudentController {
+
+    private static final Logger logger = LoggerFactory.getLogger(StudentController.class);
 
     @Autowired
     private StudentService studentService;
@@ -140,5 +146,91 @@ public class StudentController {
     public ResponseEntity<List<ProgressReport>> getProgressReports(Authentication authentication) {
         String studentId = ((Student) studentService.getCurrentStudent(authentication)).getId();
         return ResponseEntity.ok(studentService.getProgressReports(studentId));
+    }
+
+    @GetMapping("/me/profile")
+    @PreAuthorize("hasRole('STUDENT')")
+    @Operation(summary = "Get student profile", description = "Get current student's profile information")
+    public ResponseEntity<StudentProfileDTO> getMyProfile(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Authentication authentication) {
+        String studentId = ((Student) studentService.getCurrentStudent(authentication)).getId();
+        return ResponseEntity.ok(studentService.getStudentProfileById(studentId));
+    }
+
+    @PutMapping("/me/profile")
+    @PreAuthorize("hasRole('STUDENT')")
+    @Operation(summary = "Update student profile", description = "Update current student's profile information")
+    public ResponseEntity<StudentProfileDTO> updateMyProfile(
+            @Valid @RequestBody StudentUpdateDTO updateDTO,
+            Authentication authentication) {
+        String studentId = ((Student) studentService.getCurrentStudent(authentication)).getId();
+        return ResponseEntity.ok(studentService.updateStudentProfile(studentId, updateDTO));
+    }
+
+    @GetMapping("/profiles")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MENTOR')")
+    @Operation(summary = "Get all student profiles", description = "Get paginated list of student profiles")
+    public ResponseEntity<StudentProfileResponseDTO> getAllStudentProfiles(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<StudentProfileDTO> profilesPage = studentService.getStudentProfiles(page, size);
+        return ResponseEntity.ok(new StudentProfileResponseDTO(profilesPage));
+    }
+
+    @PostMapping("/me/certificates")
+    @PreAuthorize("hasRole('STUDENT')")
+    @Operation(summary = "Upload certificate", description = "Upload a new certificate document")
+    public ResponseEntity<CertificateDTO> uploadCertificate(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("description") String description,
+            Authentication authentication) {
+        logger.debug("Received certificate upload request for file: {}", file.getOriginalFilename());
+        try {
+            Student currentStudent = studentService.getCurrentStudent(authentication);
+            if (currentStudent == null) {
+                logger.error("No authenticated student found");
+                throw new RuntimeException("No authenticated student found");
+            }
+            String studentId = currentStudent.getId();
+            logger.debug("Processing certificate upload for student: {}", studentId);
+            
+            CertificateDTO certificate = studentService.uploadCertificate(studentId, file, description);
+            logger.debug("Certificate uploaded successfully: {}", certificate.getId());
+            
+            return ResponseEntity.ok(certificate);
+        } catch (Exception e) {
+            logger.error("Error uploading certificate: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @GetMapping("/me/certificates")
+    @PreAuthorize("hasRole('STUDENT')")
+    @Operation(summary = "Get student certificates", description = "Get all certificates uploaded by the student")
+    public ResponseEntity<List<CertificateDTO>> getMyCertificates(Authentication authentication) {
+        String studentId = ((Student) studentService.getCurrentStudent(authentication)).getId();
+        List<CertificateDTO> certificates = studentService.getStudentCertificates(studentId);
+        return ResponseEntity.ok(certificates);
+    }
+
+    @DeleteMapping("/me/certificates/{certificateId}")
+    @PreAuthorize("hasRole('STUDENT')")
+    @Operation(summary = "Delete certificate", description = "Delete a certificate document")
+    public ResponseEntity<Void> deleteCertificate(
+            @PathVariable String certificateId,
+            Authentication authentication) {
+        String studentId = ((Student) studentService.getCurrentStudent(authentication)).getId();
+        studentService.deleteCertificate(studentId, certificateId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/me/mentor")
+    @PreAuthorize("hasRole('STUDENT')")
+    @Operation(summary = "Get mentor information", description = "Get information about the student's assigned mentor")
+    public ResponseEntity<MentorResponse> getMyMentorInfo(Authentication authentication) {
+        String studentId = ((Student) studentService.getCurrentStudent(authentication)).getId();
+        return ResponseEntity.ok(studentService.getMyMentor(studentId));
     }
 }

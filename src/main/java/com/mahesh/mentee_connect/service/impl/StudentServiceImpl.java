@@ -23,9 +23,27 @@ import java.time.LocalDateTime;
 import com.mahesh.mentee_connect.dto.StudentDTO;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.multipart.MultipartFile;
+import com.mahesh.mentee_connect.dto.CertificateDTO;
+import com.mahesh.mentee_connect.dto.StudentUpdateDTO;
+import com.mahesh.mentee_connect.model.Certificate;
+import com.mahesh.mentee_connect.repository.CertificateRepository;
+import com.mahesh.mentee_connect.exception.UnauthorizedException;
+import com.mahesh.mentee_connect.dto.StudentProfileDTO;
+import com.mahesh.mentee_connect.dto.StudentProfileResponseDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class StudentServiceImpl implements StudentService {
+    
+    private static final Logger logger = LoggerFactory.getLogger(StudentServiceImpl.class);
     
     @Autowired
     private StudentRepository studentRepository;
@@ -38,6 +56,12 @@ public class StudentServiceImpl implements StudentService {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private CertificateRepository certificateRepository;
+
+    @Value("${app.upload.dir:uploads/certificates}")
+    private String uploadDir;
 
     @Override
     @Transactional
@@ -144,9 +168,11 @@ public class StudentServiceImpl implements StudentService {
     @Transactional(readOnly = true)
     public Student getCurrentStudent(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
+            logger.error("Authentication is null or not authenticated");
             return null;
         }
         String username = authentication.getName();
+        logger.debug("Getting current student for username: {}", username);
         return studentRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Student", "username", username));
     }
@@ -267,5 +293,153 @@ public class StudentServiceImpl implements StudentService {
         mentorRepository.save(mentor);
         
         return updatedStudents;
+    }
+
+    @Override
+    public CertificateDTO uploadCertificate(String studentId, MultipartFile file, String description) {
+        try {
+            // Verify student exists
+            Student student = studentRepository.findById(studentId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + studentId));
+
+            // Create upload directory if it doesn't exist
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            // Generate unique filename
+            String originalFilename = file.getOriginalFilename();
+            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String filename = UUID.randomUUID().toString() + extension;
+
+            // Save file
+            Path filePath = uploadPath.resolve(filename);
+            Files.copy(file.getInputStream(), filePath);
+
+            // Create certificate record
+            Certificate certificate = new Certificate();
+            certificate.setStudentId(studentId);
+            certificate.setCertificateName(originalFilename);
+            certificate.setCertificateUrl("/api/certificates/" + filename);
+            certificate.setFilename(filename);
+            certificate.setDescription(description);
+            certificate.setUploadDate(LocalDateTime.now());
+            certificate.setStatus("PENDING");
+
+            // Save certificate to database
+            certificate = certificateRepository.save(certificate);
+
+            // Convert to DTO
+            return convertToDTO(certificate);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store file " + file.getOriginalFilename(), e);
+        }
+    }
+
+    @Override
+    public List<CertificateDTO> getStudentCertificates(String studentId) {
+        // Verify student exists
+        if (!studentRepository.existsById(studentId)) {
+            throw new ResourceNotFoundException("Student not found with id: " + studentId);
+        }
+
+        // Get certificates from database
+        List<Certificate> certificates = certificateRepository.findByStudentId(studentId);
+        return certificates.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteCertificate(String studentId, String certificateId) {
+        // Verify student exists
+        if (!studentRepository.existsById(studentId)) {
+            throw new ResourceNotFoundException("Student not found with id: " + studentId);
+        }
+
+        // Get certificate from database
+        Certificate certificate = certificateRepository.findById(certificateId)
+                .orElseThrow(() -> new ResourceNotFoundException("Certificate not found with id: " + certificateId));
+
+        // Verify certificate belongs to student
+        if (!certificate.getStudentId().equals(studentId)) {
+            throw new UnauthorizedException("Certificate does not belong to student");
+        }
+
+        // Delete file from storage
+        Path filePath = Paths.get(uploadDir).resolve(certificate.getFilename());
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to delete file", e);
+        }
+
+        // Delete certificate from database
+        certificateRepository.delete(certificate);
+    }
+
+    private CertificateDTO convertToDTO(Certificate certificate) {
+        CertificateDTO dto = new CertificateDTO();
+        dto.setId(certificate.getId());
+        dto.setStudentId(certificate.getStudentId());
+        dto.setCertificateName(certificate.getCertificateName());
+        dto.setCertificateUrl(certificate.getCertificateUrl());
+        dto.setUploadDate(certificate.getUploadDate());
+        dto.setDescription(certificate.getDescription());
+        dto.setStatus(certificate.getStatus());
+        return dto;
+    }
+
+    @Override
+    public Page<StudentProfileDTO> getStudentProfiles(int page, int size) {
+        Page<Student> studentsPage = studentRepository.findAll(PageRequest.of(page, size));
+        return studentsPage.map(this::convertToProfileDTO);
+    }
+
+    @Override
+    public StudentProfileDTO getStudentProfileById(String id) {
+        Student student = getStudentById(id);
+        return convertToProfileDTO(student);
+    }
+
+    @Override
+    public StudentProfileDTO updateStudentProfile(String studentId, StudentUpdateDTO updateDTO) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + studentId));
+
+        student.setFirstName(updateDTO.getFirstName());
+        student.setLastName(updateDTO.getLastName());
+        student.setEmail(updateDTO.getEmail());
+        student.setPhoneNumber(updateDTO.getPhoneNumber());
+        student.setCourse(updateDTO.getCourse());
+        student.setBatch(updateDTO.getBatch());
+        student.setSemester(updateDTO.getSemester());
+
+        student = studentRepository.save(student);
+        return convertToProfileDTO(student);
+    }
+
+    private StudentProfileDTO convertToProfileDTO(Student student) {
+        StudentProfileDTO dto = new StudentProfileDTO();
+        dto.setId(student.getId());
+        dto.setStudentId(student.getStudentId());
+        dto.setUsername(student.getUsername());
+        dto.setEmail(student.getEmail());
+        dto.setFirstName(student.getFirstName());
+        dto.setLastName(student.getLastName());
+        dto.setPhoneNumber(student.getPhoneNumber());
+        dto.setCourse(student.getCourse());
+        dto.setBatch(student.getBatch());
+        dto.setSemester(student.getSemester());
+        dto.setAttendance(student.getAttendance());
+        dto.setCgpa(student.getCgpa());
+        
+        // Only set mentor ID instead of full mentor object
+        if (student.getAssignedMentor() != null) {
+            dto.setMentorId(student.getAssignedMentor().getId());
+        }
+        
+        return dto;
     }
 } 

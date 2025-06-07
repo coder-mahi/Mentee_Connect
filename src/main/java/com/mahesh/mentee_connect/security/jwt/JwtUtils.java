@@ -33,20 +33,24 @@ public class JwtUtils {
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
                 .claim("role", role)
-                .claim("authorities", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(getSigningKey())
+                .signWith(getSigningKey(), SignatureAlgorithm.HS384)
                 .compact();
     }
 
     public String getUserNameFromJwtToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (Exception e) {
+            logger.error("Error getting username from JWT token: {}", e.getMessage());
+            return null;
+        }
     }
 
     public boolean validateJwtToken(String authToken) {
@@ -55,6 +59,7 @@ public class JwtUtils {
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(authToken);
+            logger.debug("JWT token is valid");
             return true;
         } catch (SecurityException e) {
             logger.error("Invalid JWT signature: {}", e.getMessage());
@@ -71,16 +76,26 @@ public class JwtUtils {
     }
 
     public String getRoleFromJwtToken(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.get("role", String.class);
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.get("role", String.class);
+        } catch (Exception e) {
+            logger.error("Error getting role from JWT token: {}", e.getMessage());
+            return null;
+        }
     }
 
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
-        return Keys.hmacShaKeyFor(keyBytes);
+        try {
+            byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+            return Keys.hmacShaKeyFor(keyBytes);
+        } catch (Exception e) {
+            logger.error("Error creating signing key: {}", e.getMessage());
+            throw e;
+        }
     }
 }
