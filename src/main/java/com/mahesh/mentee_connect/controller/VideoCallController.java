@@ -11,12 +11,25 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/video-calls")
+@RequestMapping("/video-calls")
 @CrossOrigin(origins = "*") // Configure as per your frontend URL
 public class VideoCallController {
 
     @Autowired
     private VideoCallService videoCallService;
+
+    @PostMapping
+    public ResponseEntity<?> initializeVideoCall(@RequestBody Map<String, String> request) {
+        try {
+            String meetingId = request.get("meetingId");
+            String mentorId = request.get("mentorId");
+            
+            VideoCall videoCall = videoCallService.initializeCall(meetingId, mentorId);
+            return ResponseEntity.ok(videoCall);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error initializing video call: " + e.getMessage());
+        }
+    }
 
     // Create new video call (Mentor only)
     @PostMapping("/create")

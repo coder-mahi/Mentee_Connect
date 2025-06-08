@@ -15,6 +15,19 @@ public class VideoCallService {
     @Autowired
     private VideoCallRepository videoCallRepository;
 
+    public VideoCall initializeCall(String meetingId, String mentorId) {
+        VideoCall videoCall = new VideoCall();
+        videoCall.setMentorId(mentorId);
+        videoCall.setStatus("INITIALIZED");
+        videoCall.setCreatedAt(LocalDateTime.now());
+        videoCall.setRoomId(generateRoomId());
+        return videoCallRepository.save(videoCall);
+    }
+
+    private String generateRoomId() {
+        return "room_" + System.currentTimeMillis() + "_" + (int)(Math.random() * 1000);
+    }
+
     // Create a new video call (only mentors can create)
     public VideoCall createVideoCall(String mentorId, String mentorName, String title, 
                                    String description, LocalDateTime scheduledTime, 

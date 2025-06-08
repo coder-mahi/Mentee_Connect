@@ -82,6 +82,10 @@ public class SecurityConfig {
                     .requestMatchers("/api/students/me/**").hasRole("STUDENT")
                     .requestMatchers("/api/students/**").hasRole("STUDENT")
                     .requestMatchers("/batches/**").hasRole("ADMIN")
+                    .requestMatchers("/api/meetings/**").authenticated()
+                    .requestMatchers("/api/video-calls/**").authenticated()
+                    .requestMatchers("/api/chat/**").authenticated()
+                    .requestMatchers("/ws/**").permitAll()
                     .anyRequest().authenticated()
             );
 

@@ -14,7 +14,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/meetings")
+@RequestMapping("/meetings")
 @Tag(name = "Meetings", description = "Meeting management APIs")
 public class MeetingController {
     @Autowired
